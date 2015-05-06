@@ -6,4 +6,14 @@ simple uptime status checks, but the ability to add in additional statu type
 checks like load times, page load sizes, etc... will be added.
 
 
+## Development
+
+Copy the `.env.sample` file to `.env` and set the sample enviroment variables to
+your preferred settings.
+
+```bash
+$ go run main.go
+```
+
+
 [1]: https://www.pingdom.com/
