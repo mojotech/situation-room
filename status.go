@@ -21,16 +21,15 @@ func startStatusCheckers() error {
 	return nil
 }
 
-func siteCheck(s *Site) error {
+func siteCheck(s *Site) {
 	ticker := time.NewTicker(60 * time.Second)
+	checkSiteStatus(s)
 	for {
 		select {
 		case <-ticker.C:
 			go checkSiteStatus(s)
 		}
 	}
-
-	return nil
 }
 
 // Hit the site URL with a HEAD request and update appropriate fields

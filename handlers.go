@@ -58,15 +58,11 @@ func createStatusHandler(c *echo.Context) error {
 		return c.JSON(http.StatusBadRequest, "URL parameter required")
 	}
 
-	// NOTE: We dont care if this URL already existed, so we don't check the first `bool` return value.
-	// The redis lib returns a bool if the return code from SADD was 1.  It will be 0 if the url was already
-	// in the set.
-	_, err = redisClient.Sadd(redisScopedKey(sitesRedisKey), []byte(params.URL))
+	newSite, err := redisClient.Sadd(redisScopedKey(sitesRedisKey), []byte(params.URL))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Problem saving your new site")
 	}
 
-	// See NOTE above about ignoring the bool return value here as well
 	if len(params.Email) > 0 {
 		_, err = redisClient.Hset(redisScopedKey(emailsRedisKey), params.URL, []byte(params.Email))
 		if err != nil {
@@ -74,5 +70,9 @@ func createStatusHandler(c *echo.Context) error {
 		}
 	}
 
-	return c.JSON(http.StatusCreated, &Site{URL: params.URL})
+	site := &Site{URL: params.URL}
+	if newSite {
+		go siteCheck(site)
+	}
+	return c.JSON(http.StatusCreated, site)
 }
