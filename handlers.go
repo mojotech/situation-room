@@ -59,6 +59,7 @@ func createStatusHandler(c *echo.Context) *echo.HTTPError {
 	}
 
 	params.URL = strings.TrimSpace(params.URL)
+	params.Email = strings.TrimSpace(params.Email)
 
 	if 0 == len(strings.TrimSpace(params.URL)) {
 		return c.JSON(http.StatusBadRequest, "URL parameter required")
@@ -70,6 +71,14 @@ func createStatusHandler(c *echo.Context) *echo.HTTPError {
 	_, err = redisClient.Sadd(redisScopedKey(sitesRedisKey), []byte(params.URL))
 	if err != nil {
 		return handleError(http.StatusInternalServerError, "Problem saving your new site", err)
+	}
+
+	// See NOTE above about ignoring the bool return value here as well
+	if len(params.Email) > 0 {
+		_, err = redisClient.Hset(redisScopedKey(emailsRedisKey), params.URL, []byte(params.Email))
+		if err != nil {
+			return handleError(http.StatusInternalServerError, "Problem saving your site email address to alert", err)
+		}
 	}
 
 	return c.JSON(http.StatusCreated, &Site{URL: params.URL})

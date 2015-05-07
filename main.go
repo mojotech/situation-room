@@ -12,7 +12,8 @@ import (
 )
 
 const (
-	sitesRedisKey = "sites"
+	sitesRedisKey  = "sites"
+	emailsRedisKey = "site-emails"
 )
 
 var (
