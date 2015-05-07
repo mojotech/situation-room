@@ -13,13 +13,6 @@ type StatusPostInput struct {
 	Email string `json:"email"`
 }
 
-type Site struct {
-	URL        string `json:"url"`
-	Status     string `json:"status"`
-	LastStatus string `json:"-"`
-	LastCheck  string `json:"last_checked_at"`
-}
-
 type SitesResponse struct {
 	Sites []Site `json:"sites"`
 }

@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
+	"time"
 
 	"github.com/hoisie/redis"
 	_ "github.com/joho/godotenv/autoload"
@@ -23,8 +25,21 @@ var (
 	redisClient redis.Client
 )
 
+type Site struct {
+	URL            string    `json:"url"`
+	Status         string    `json:"status"`
+	StatusCode     int       `json:"status_code"`
+	PreviousStatus string    `json:"-"`
+	LastCheck      time.Time `json:"last_checked_at"`
+}
+
 func main() {
 	flag.Parse()
+
+	err := startStatusCheckers()
+	if err != nil {
+		log.Fatalln("* Failed to start status checkers:", err.Error())
+	}
 
 	e := echo.New()
 	e.Use(mw.Logger())
