@@ -22,17 +22,7 @@ type SitesResponse struct {
 // response:
 //   sites: <array> sites registered with the system
 func statusHandler(c *echo.Context) error {
-	redisSites, err := redisClient.Smembers(redisScopedKey(sitesRedisKey))
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Problem retrieving list of sites")
-	}
-
-	sites := make([]Site, len(redisSites))
-	for i, s := range redisSites {
-		sites[i] = Site{URL: string(s)}
-	}
-
-	return c.JSON(http.StatusOK, &SitesResponse{Sites: sites})
+	return c.JSON(http.StatusOK, &SitesResponse{Sites: AllSites})
 }
 
 // POST /status
@@ -72,7 +62,8 @@ func createStatusHandler(c *echo.Context) error {
 
 	site := &Site{URL: params.URL}
 	if newSite {
-		go siteCheck(site)
+		go siteCheck(*site)
+		AllSites = append(AllSites, *site)
 	}
 	return c.JSON(http.StatusCreated, site)
 }
