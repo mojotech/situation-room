@@ -2,3 +2,4 @@ build/
 .env
 TODO.md
 NOTES.md
+gin-bin
