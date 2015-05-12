@@ -63,6 +63,7 @@ func main() {
 	e.Use(mw.Logger())
 	e.Get("/sites", sitesHandler)
 	e.Post("/sites", createSiteHandler)
+	e.Get("/sites/:key", siteHandler)
 	e.Run(":" + serverPort)
 }
 

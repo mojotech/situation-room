@@ -2,7 +2,9 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/labstack/echo"
@@ -15,6 +17,11 @@ type StatusPostInput struct {
 
 type SitesResponse struct {
 	Sites []Site `json:"sites"`
+}
+
+type SiteResponse struct {
+	SiteKey  string  `json:"site_key"`
+	Statuses []int64 `json:"statuses"`
 }
 
 // GET /sites
@@ -66,4 +73,40 @@ func createSiteHandler(c *echo.Context) error {
 		AllSites = append(AllSites, *site)
 	}
 	return c.JSON(http.StatusCreated, site)
+}
+
+// GET /sites/:key
+//
+// response:
+//	 site_key: <string> site hash key
+//	 statuses: <array> chronologically ordered status codes from recent checks
+func siteHandler(c *echo.Context) error {
+	siteKey := c.P(0)
+	redisKey := redisScopedKey(fmt.Sprintf("%s:%s", uptimeRedisKey, siteKey))
+
+	rawStatuses, err := redisClient.Lrange(redisKey, 0, minutesInMonth)
+	if err != nil {
+		handleError(http.StatusInternalServerError, "Problem retrieving statuses", err)
+	}
+
+	statuses := make([]int64, len(rawStatuses))
+	for i, s := range rawStatuses {
+		statuses[i], err = strconv.ParseInt(string(s), 10, 16)
+		if err != nil {
+			statuses[i] = 0
+		}
+	}
+
+	resp := SiteResponse{Statuses: statuses, SiteKey: siteKey}
+
+	return c.JSON(http.StatusOK, resp)
+}
+
+func handleError(code int, message string, e error) *echo.HTTPError {
+	err := &echo.HTTPError{
+		Code:    code,
+		Message: message,
+		Error:   e,
+	}
+	return err
 }
