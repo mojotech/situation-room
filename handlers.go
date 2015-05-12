@@ -17,15 +17,15 @@ type SitesResponse struct {
 	Sites []Site `json:"sites"`
 }
 
-// GET /status
+// GET /sites
 //
 // response:
 //   sites: <array> sites registered with the system
-func statusHandler(c *echo.Context) error {
+func sitesHandler(c *echo.Context) error {
 	return c.JSON(http.StatusOK, &SitesResponse{Sites: AllSites})
 }
 
-// POST /status
+// POST /sites
 //
 // params:
 //   url: <string, required> website url to check
@@ -33,7 +33,7 @@ func statusHandler(c *echo.Context) error {
 //
 // response:
 //   site: <json> newly created site info
-func createStatusHandler(c *echo.Context) error {
+func createSiteHandler(c *echo.Context) error {
 	var params StatusPostInput
 	d := json.NewDecoder(c.Request().Body)
 	err := d.Decode(&params)

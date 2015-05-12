@@ -61,8 +61,8 @@ func main() {
 
 	e := echo.New()
 	e.Use(mw.Logger())
-	e.Get("/status", statusHandler)
-	e.Post("/status", createStatusHandler)
+	e.Get("/sites", sitesHandler)
+	e.Post("/sites", createSiteHandler)
 	e.Run(":" + serverPort)
 }
 
