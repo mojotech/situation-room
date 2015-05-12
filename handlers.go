@@ -20,7 +20,7 @@ type SitesResponse struct {
 }
 
 type SiteResponse struct {
-	SiteKey  string  `json:"site_key"`
+	Key      string  `json:"key"`
 	Statuses []int64 `json:"statuses"`
 }
 
@@ -97,7 +97,7 @@ func siteHandler(c *echo.Context) error {
 		}
 	}
 
-	resp := SiteResponse{Statuses: statuses, SiteKey: siteKey}
+	resp := SiteResponse{Statuses: statuses, Key: siteKey}
 
 	return c.JSON(http.StatusOK, resp)
 }

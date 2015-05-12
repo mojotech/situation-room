@@ -29,20 +29,20 @@ var (
 )
 
 type Site struct {
+	Key            string    `json:"key"`
 	URL            string    `json:"url"`
 	Status         string    `json:"status"`
 	StatusCode     int       `json:"status_code"`
 	LastCheck      time.Time `json:"last_checked_at"`
 	PreviousStatus string    `json:"-"`
-	hashKey        string    `json:"-"`
 }
 
 func (s *Site) HashKey() string {
-	if 0 == len(s.hashKey) {
-		s.hashKey = fmt.Sprintf("%x", md5.Sum([]byte(s.URL)))
+	if 0 == len(s.Key) {
+		s.Key = fmt.Sprintf("%x", md5.Sum([]byte(s.URL)))
 	}
 
-	return s.hashKey
+	return s.Key
 }
 
 func main() {
@@ -74,7 +74,9 @@ func loadSites() ([]Site, error) {
 	}
 
 	for _, s := range redisSites {
-		AllSites = append(AllSites, Site{URL: string(s)})
+		site := Site{URL: string(s)}
+		site.Key = site.HashKey()
+		AllSites = append(AllSites, site)
 	}
 
 	return AllSites, nil
