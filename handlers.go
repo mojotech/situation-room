@@ -52,7 +52,7 @@ func statusHandler(c *echo.Context) *echo.HTTPError {
 //   site: <json> newly created site info
 func createStatusHandler(c *echo.Context) *echo.HTTPError {
 	var params StatusPostInput
-	d := json.NewDecoder(c.Request.Body)
+	d := json.NewDecoder(c.Request().Body)
 	err := d.Decode(&params)
 	if err != nil {
 		return handleError(http.StatusBadRequest, "Unable to decode JSON body", err)
