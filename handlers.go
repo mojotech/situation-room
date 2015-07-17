@@ -28,10 +28,10 @@ type SitesResponse struct {
 //
 // response:
 //   sites: <array> sites registered with the system
-func statusHandler(c *echo.Context) *echo.HTTPError {
+func statusHandler(c *echo.Context) error {
 	redisSites, err := redisClient.Smembers(redisScopedKey(sitesRedisKey))
 	if err != nil {
-		return handleError(http.StatusInternalServerError, "Problem retrieving list of sites", err)
+		return echo.NewHTTPError(http.StatusInternalServerError, "Problem retrieving list of sites")
 	}
 
 	sites := make([]Site, len(redisSites))
@@ -50,12 +50,12 @@ func statusHandler(c *echo.Context) *echo.HTTPError {
 //
 // response:
 //   site: <json> newly created site info
-func createStatusHandler(c *echo.Context) *echo.HTTPError {
+func createStatusHandler(c *echo.Context) error {
 	var params StatusPostInput
 	d := json.NewDecoder(c.Request().Body)
 	err := d.Decode(&params)
 	if err != nil {
-		return handleError(http.StatusBadRequest, "Unable to decode JSON body", err)
+		return echo.NewHTTPError(http.StatusBadRequest, "Unable to decode JSON body")
 	}
 
 	params.URL = strings.TrimSpace(params.URL)
@@ -70,25 +70,16 @@ func createStatusHandler(c *echo.Context) *echo.HTTPError {
 	// in the set.
 	_, err = redisClient.Sadd(redisScopedKey(sitesRedisKey), []byte(params.URL))
 	if err != nil {
-		return handleError(http.StatusInternalServerError, "Problem saving your new site", err)
+		return echo.NewHTTPError(http.StatusInternalServerError, "Problem saving your new site")
 	}
 
 	// See NOTE above about ignoring the bool return value here as well
 	if len(params.Email) > 0 {
 		_, err = redisClient.Hset(redisScopedKey(emailsRedisKey), params.URL, []byte(params.Email))
 		if err != nil {
-			return handleError(http.StatusInternalServerError, "Problem saving your site email address to alert", err)
+			return echo.NewHTTPError(http.StatusInternalServerError, "Problem saving your site email address to alert")
 		}
 	}
 
 	return c.JSON(http.StatusCreated, &Site{URL: params.URL})
-}
-
-func handleError(code int, message string, e error) *echo.HTTPError {
-	err := &echo.HTTPError{
-		Code:    code,
-		Message: message,
-		Error:   e,
-	}
-	return err
 }
