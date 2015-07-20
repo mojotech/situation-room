@@ -10,15 +10,18 @@ import (
 	"github.com/labstack/echo"
 )
 
+// StatusPostInput - JSON Param input for adding a new status check
 type StatusPostInput struct {
 	URL   string `json:"url"`
 	Email string `json:"email"`
 }
 
+// SitesResponse - JSON response for listing sites
 type SitesResponse struct {
 	Sites []Site `json:"sites"`
 }
 
+// SiteResponse - JSON response for a single site
 type SiteResponse struct {
 	Key      string  `json:"key"`
 	Statuses []int64 `json:"statuses"`
@@ -86,7 +89,7 @@ func siteHandler(c *echo.Context) error {
 
 	rawStatuses, err := redisClient.Lrange(redisKey, 0, minutesInMonth)
 	if err != nil {
-		handleError(http.StatusInternalServerError, "Problem retrieving statuses", err)
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	statuses := make([]int64, len(rawStatuses))
@@ -100,13 +103,4 @@ func siteHandler(c *echo.Context) error {
 	resp := SiteResponse{Statuses: statuses, Key: siteKey}
 
 	return c.JSON(http.StatusOK, resp)
-}
-
-func handleError(code int, message string, e error) *echo.HTTPError {
-	err := &echo.HTTPError{
-		Code:    code,
-		Message: message,
-		Error:   e,
-	}
-	return err
 }
