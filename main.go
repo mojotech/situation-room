@@ -27,7 +27,7 @@ func main() {
 	flag.Parse()
 
 	e := echo.New()
-	e.Use(mw.Logger)
+	e.Use(mw.Logger())
 	e.Get("/status", statusHandler)
 	e.Post("/status", createStatusHandler)
 	e.Run(":" + serverPort)
