@@ -4,3 +4,5 @@ build/
 TODO.md
 NOTES.md
 gin-bin
+client/node_modules
+client/public

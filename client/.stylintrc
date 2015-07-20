@@ -1,0 +1,27 @@
+{
+  "colons" : {
+    "expect" : "always",
+    "error" : true
+  },
+  "namingConvention": {
+    "expect" : "lowercase-dash",
+    "error" : true
+  },
+  "namingConventionStrict" : true,
+  "quotePref" : {
+    "expect" : "single",
+    "error" : true
+  },
+  "semicolons": {
+    "expect" : "never",
+    "error" : true
+  },
+  "trailingWhitespace" : {
+    "expect" : "never",
+    "error" : true
+  },
+  "zeroUnits" : {
+    "expect" : "never",
+    "error" : true
+  }
+}

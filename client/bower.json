@@ -1,0 +1,14 @@
+{
+  "name": "situation-room",
+  "description": "",
+  "main": "index.html",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "src/bower_components",
+    "tests"
+  ],
+  "dependencies": {
+  }
+}
