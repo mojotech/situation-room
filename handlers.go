@@ -71,6 +71,7 @@ func createSiteHandler(c *echo.Context) error {
 	}
 
 	site := &Site{URL: params.URL}
+	site.Key = site.HashKey()
 	if newSite {
 		go siteCheck(*site)
 		AllSites = append(AllSites, *site)
