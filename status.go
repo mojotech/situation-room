@@ -18,7 +18,6 @@ var (
 
 func startStatusCheckers(sites []Site) error {
 	for _, s := range sites {
-		fmt.Println("**", s.URL)
 		go siteCheck(s)
 	}
 
@@ -26,22 +25,23 @@ func startStatusCheckers(sites []Site) error {
 }
 
 func siteCheck(s Site) {
-	fmt.Println("!!", s.URL)
+	fmt.Println("[DEBUG] Starting check for site:", s.URL)
 	ticker := time.NewTicker(60 * time.Second)
-	checkSiteStatus(s)
+	checkSiteStatus(&s)
 	for {
 		if ERROR_STATUS == s.Status {
+			log.Println("[INFO] Stopping check for site due to error:", s.URL)
 			break
 		}
 		select {
 		case <-ticker.C:
-			go checkSiteStatus(s)
+			go checkSiteStatus(&s)
 		}
 	}
 }
 
 // Hit the site URL with a HEAD request and update appropriate fields
-func checkSiteStatus(s Site) {
+func checkSiteStatus(s *Site) {
 	// If this is an invalid Site config, don't even bother checking
 	if ERROR_STATUS == s.Status {
 		return
@@ -52,7 +52,7 @@ func checkSiteStatus(s Site) {
 	resp, err := http.Head(s.URL)
 	if err != nil {
 		s.Status = ERROR_STATUS
-		log.Println("[ERROR] Problem creating new HTTP request:", err.Error())
+		log.Println("[WARN] Problem creating new HTTP request:", err.Error())
 		return
 	}
 
