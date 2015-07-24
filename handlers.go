@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -39,14 +38,13 @@ func sitesHandler(c *echo.Context) error {
 //
 // params:
 //   url: <string, required> website url to check
-//	 email: <string, options> email address to alert on status changes
+//   email: <string, options> email address to alert on status changes
 //
 // response:
 //   site: <json> newly created site info
 func createSiteHandler(c *echo.Context) error {
 	var params StatusPostInput
-	d := json.NewDecoder(c.Request().Body)
-	err := d.Decode(&params)
+	err := c.Bind(&params)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "Unable to decode JSON body")
 	}
