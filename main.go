@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/md5"
+	"database/sql"
 	"flag"
 	"fmt"
 	"log"
@@ -12,6 +13,8 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/labstack/echo"
 	mw "github.com/labstack/echo/middleware"
+	_ "github.com/mattn/go-sqlite3"
+	"gopkg.in/gorp.v1"
 )
 
 const (
@@ -26,6 +29,7 @@ var (
 
 	AllSites    []Site
 	redisClient redis.Client
+	db          *gorp.DbMap
 )
 
 type Site struct {
@@ -47,6 +51,8 @@ func (s *Site) HashKey() string {
 
 func main() {
 	flag.Parse()
+
+	db = setupDb()
 
 	AllSites, err := loadSites()
 	if err != nil {
@@ -84,4 +90,21 @@ func loadSites() ([]Site, error) {
 
 func redisScopedKey(key string) string {
 	return fmt.Sprintf("%s:%s", *redisScope, key)
+}
+
+func setupDb() *gorp.DbMap {
+	// Open SQLlite db connection
+	db, err := sql.Open("sqlite3", "./situation-room.bin")
+	if err != nil {
+		log.Fatalf("Failed to open database connection", err)
+	}
+
+	dbmap := &gorp.DbMap{Db: db, Dialect: gorp.SqliteDialect{}}
+
+	err = dbmap.CreateTablesIfNotExists()
+	if err != nil {
+		log.Fatalf("Failed to create tables", err)
+	}
+
+	return dbmap
 }
