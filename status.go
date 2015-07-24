@@ -47,8 +47,6 @@ func checkSiteStatus(s Site) {
 		return
 	}
 
-	s.PreviousStatus = s.Status
-
 	resp, err := http.Head(s.URL)
 	if err != nil {
 		s.Status = ERROR_STATUS
@@ -57,10 +55,8 @@ func checkSiteStatus(s Site) {
 	}
 
 	s.Status = resp.Status
-	s.StatusCode = resp.StatusCode
-	s.LastCheck = time.Now()
 
-	err = s.LogStat(uptimeRedisKey, []byte(strconv.Itoa(s.StatusCode)))
+	err = s.LogStat([]byte(strconv.Itoa(resp.StatusCode)))
 	if err != nil {
 		log.Println("[WARN] Error logging stat:", err.Error())
 	}
@@ -68,15 +64,6 @@ func checkSiteStatus(s Site) {
 	log.Println("[DEBUG]", s.URL, s.Status)
 }
 
-func (s Site) LogStat(statKey string, val []byte) error {
-	k := redisScopedKey(fmt.Sprintf("%s:%s", statKey, s.HashKey()))
-
-	// When using LPUSH + LTRIM immediately this is really an O(1) operation because in the average
-	// case just one element is removed from the tail of the list
-	err := redisClient.Lpush(k, val)
-	if err != nil {
-		return err
-	}
-	err = redisClient.Ltrim(k, 0, minutesInMonth)
-	return err
+func (s Site) LogStat(val []byte) error {
+	return nil
 }
