@@ -39,6 +39,14 @@ func (s *Site) HashId() string {
 	return s.Id
 }
 
+type Check struct {
+	Id        int64     `json:"id"`
+	URL       string    `json:"url"`
+	Response  int       `json:"response"`
+	SiteId    string    `json:"siteId"`
+	CreatedAt time.Time `json:"createdAt"`
+}
+
 func main() {
 	flag.Parse()
 
@@ -62,6 +70,7 @@ func main() {
 	e.Get("/sites", sitesHandler)
 	e.Post("/sites", createSiteHandler)
 	e.Get("/sites/:key", siteHandler)
+	e.Get("/sites/:key/checks", checksHandler)
 	e.Run(":" + serverPort)
 }
 
@@ -81,6 +90,7 @@ func setupDb() *gorp.DbMap {
 	dbmap := &gorp.DbMap{Db: db, Dialect: gorp.SqliteDialect{}}
 
 	dbmap.AddTableWithName(Site{}, "sites")
+	dbmap.AddTableWithName(Check{}, "checks").SetKeys(true, "Id")
 
 	err = dbmap.CreateTablesIfNotExists()
 	if err != nil {

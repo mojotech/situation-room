@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -56,7 +55,7 @@ func checkSiteStatus(s Site) {
 
 	s.Status = resp.Status
 
-	err = s.LogStat([]byte(strconv.Itoa(resp.StatusCode)))
+	err = s.LogStat(resp.StatusCode)
 	if err != nil {
 		log.Println("[WARN] Error logging stat:", err.Error())
 	}
@@ -64,6 +63,12 @@ func checkSiteStatus(s Site) {
 	log.Println("[DEBUG]", s.URL, s.Status)
 }
 
-func (s Site) LogStat(val []byte) error {
-	return nil
+func (s Site) LogStat(status int) error {
+	var check Check
+	check.SiteId = s.Id
+	check.Response = status
+	check.URL = s.URL
+	check.CreatedAt = time.Now()
+	err := db.Insert(&check)
+	return err
 }

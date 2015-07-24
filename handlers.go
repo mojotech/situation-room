@@ -9,29 +9,11 @@ import (
 	"github.com/labstack/echo"
 )
 
-// StatusPostInput - JSON Param input for adding a new status check
-type StatusPostInput struct {
-	URL   string `json:"url"`
-	Email string `json:"email"`
-}
-
-// SitesResponse - JSON response for listing sites
-type SitesResponse struct {
-	Sites []Site `json:"sites"`
-}
-
-// SiteResponse - JSON response for a single site
-type SiteResponse struct {
-	Key      string  `json:"key"`
-	Statuses []int64 `json:"statuses"`
-}
-
 // GET /sites
-//
 // response:
 //   sites: <array> sites registered with the system
 func sitesHandler(c *echo.Context) error {
-	return c.JSON(http.StatusOK, &SitesResponse{Sites: AllSites})
+	return c.JSON(http.StatusOK, AllSites)
 }
 
 // POST /sites
@@ -85,4 +67,17 @@ func siteHandler(c *echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, site)
+}
+
+// GET /sites/:key/checks
+func checksHandler(c *echo.Context) error {
+	siteKey := c.P(0)
+	var checks []Check
+
+	_, err := db.Select(&checks, "SELECT * FROM checks WHERE siteId=$1", siteKey)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "No checks found for site")
+	}
+
+	return c.JSON(http.StatusOK, checks)
 }
