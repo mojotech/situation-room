@@ -56,11 +56,6 @@ func createSiteHandler(c *echo.Context) error {
 		return c.JSON(http.StatusBadRequest, "URL parameter required")
 	}
 
-	newSite, err := redisClient.Sadd(redisScopedKey(sitesRedisKey), []byte(params.URL))
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Problem saving your new site")
-	}
-
 	if len(params.Email) > 0 {
 		_, err = redisClient.Hset(redisScopedKey(emailsRedisKey), params.URL, []byte(params.Email))
 		if err != nil {
@@ -70,9 +65,19 @@ func createSiteHandler(c *echo.Context) error {
 
 	site := &Site{URL: params.URL}
 	site.Key = site.HashKey()
-	if newSite {
-		go siteCheck(*site)
-		AllSites = append(AllSites, *site)
+
+	newSite, err := redisClient.Sismember(redisScopedKey(sitesRedisKey), []byte(params.URL))
+
+	if !newSite {
+		newSite, err = redisClient.Sadd(redisScopedKey(sitesRedisKey), []byte(params.URL))
+		if newSite {
+			go siteCheck(*site)
+			AllSites = append(AllSites, *site)
+		}
+	}
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Problem saving your new site")
 	}
 	return c.JSON(http.StatusCreated, site)
 }
@@ -102,4 +107,43 @@ func siteHandler(c *echo.Context) error {
 	resp := SiteResponse{Statuses: statuses, Key: siteKey}
 
 	return c.JSON(http.StatusOK, resp)
+}
+
+// DELETE /sites/:key
+func deleteSiteHandler(c *echo.Context) error {
+	siteKey := c.P(0)
+	redisKey := redisScopedKey(fmt.Sprintf("%s:%s", uptimeRedisKey, siteKey))
+
+	removeSite(siteKey)
+	redisClient.Del(redisScopedKey(sitesRedisKey))
+	redisClient.Del(redisKey)
+
+	return c.NoContent(http.StatusNoContent)
+}
+
+// Helper functions
+func getURLFromKey(key string) string {
+	for i := range AllSites {
+		if AllSites[i].Key == key {
+			return AllSites[i].URL
+		}
+	}
+	return ""
+}
+
+func removeSiteByIndex(i int) {
+	if i < len(AllSites) - 1 {
+		AllSites = append(AllSites[:i], AllSites[i + 1:]...)
+    } else {
+        AllSites = AllSites[:i]
+    }
+}
+
+func removeSite(key string) {
+	for i := range AllSites {
+		if AllSites[i].Key == key {
+			removeSiteByIndex(i)
+			break
+		}
+	}
 }

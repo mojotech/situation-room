@@ -36,6 +36,11 @@ func siteCheck(s Site) {
 		select {
 		case <-ticker.C:
 			go checkSiteStatus(s)
+		default:
+			if !contains(AllSites, s) {
+				ticker.Stop()
+				break
+			}
 		}
 	}
 }
@@ -79,4 +84,14 @@ func (s Site) LogStat(statKey string, val []byte) error {
 	}
 	err = redisClient.Ltrim(k, 0, minutesInMonth)
 	return err
+}
+
+// Helper function
+func contains(sites []Site, s Site) bool {
+	for i := range sites {
+		if sites[i] == s {
+			return true
+		}
+	}
+	return false
 }
