@@ -23,6 +23,7 @@ type SitesResponse struct {
 // SiteResponse - JSON response for a single site
 type SiteResponse struct {
 	Key      string  `json:"key"`
+	URL      string  `json:"url"`
 	Statuses []int64 `json:"statuses"`
 }
 
@@ -100,6 +101,14 @@ func siteHandler(c *echo.Context) error {
 	}
 
 	resp := SiteResponse{Statuses: statuses, Key: siteKey}
+
+	// Get the appropriate URL for the response
+	for i := range AllSites {
+		if AllSites[i].Key == siteKey {
+			resp.URL = AllSites[i].URL
+			break
+		}
+	}
 
 	return c.JSON(http.StatusOK, resp)
 }
