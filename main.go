@@ -64,6 +64,7 @@ func main() {
 	e.Get("/sites", sitesHandler)
 	e.Post("/sites", createSiteHandler)
 	e.Get("/sites/:key", siteHandler)
+	e.Delete("/sites/:key", deleteSiteHandler)
 	e.Run(":" + serverPort)
 }
 
