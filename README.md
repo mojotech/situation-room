@@ -8,8 +8,14 @@ checks like load times, page load sizes, etc... will be added.
 
 ## Requirements
 
-* [redis][3]
 * [go][4]
+
+### Optional
+
+* [sqlite][5]
+* [postgresql][7]
+* [mysql][6]
+* [redis][3]
 
 
 ## Development
@@ -49,3 +55,6 @@ with this method.
 [2]: https://github.com/codegangsta/gin
 [3]: http://redis.io/
 [4]: http://golang.org/
+[5]: https://sqlite.org/
+[6]: https://www.mysql.com/
+[7]: http://www.postgresql.org/
