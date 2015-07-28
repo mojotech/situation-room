@@ -1,5 +1,6 @@
 build/
 .env
+*.bin
 TODO.md
 NOTES.md
 gin-bin
