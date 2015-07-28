@@ -15,7 +15,7 @@ var (
 	minutesInMonth = 30 * minutesInDay
 )
 
-func startStatusCheckers(sites []Site) error {
+func startStatusCheckers(sites map[string]Site) error {
 	for _, s := range sites {
 		fmt.Println("**", s.URL)
 		go siteCheck(s)
@@ -35,6 +35,12 @@ func siteCheck(s Site) {
 		select {
 		case <-ticker.C:
 			go checkSiteStatus(s)
+		default:
+			_, ok := AllSites[s.Id]
+			if !ok {
+				ticker.Stop()
+				break
+			}
 		}
 	}
 }
