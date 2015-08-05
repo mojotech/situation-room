@@ -13,7 +13,14 @@ import (
 // response:
 //   sites: <array> sites registered with the system
 func sitesHandler(c *echo.Context) error {
-	return c.JSON(http.StatusOK, AllSites)
+	var sites []Site
+
+	_, err := db.Select(&sites, "SELECT * FROM sites")
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "No sites found")
+	}
+
+	return c.JSON(http.StatusOK, sites)
 }
 
 // POST /sites
@@ -48,7 +55,7 @@ func createSiteHandler(c *echo.Context) error {
 	}
 
 	go siteCheck(site)
-	AllSites = append(AllSites, site)
+	AllSites[site.Id] = site
 	return c.JSON(http.StatusCreated, site)
 }
 
@@ -80,4 +87,30 @@ func checksHandler(c *echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, checks)
+}
+
+// DELETE /sites/:key
+func deleteSiteHandler(c *echo.Context) error {
+	siteKey := c.P(0)
+	err := removeSite(siteKey)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Error deleting site")
+	}
+
+	return c.NoContent(http.StatusNoContent)
+}
+
+func removeSite(Id string) error {
+	_, err := db.Exec("DELETE FROM sites WHERE id=$1", Id)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec("DELETE FROM checks WHERE siteId=$1", Id)
+
+	if err == nil {
+		delete(AllSites, Id)
+	}
+	return err
 }

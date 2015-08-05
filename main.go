@@ -17,7 +17,7 @@ import (
 var (
 	serverPort = os.Getenv("PORT")
 
-	AllSites []Site
+	AllSites map[string]Site
 	db       *gorp.DbMap
 )
 
@@ -45,13 +45,23 @@ func main() {
 	e.Post("/sites", createSiteHandler)
 	e.Get("/sites/:key", siteHandler)
 	e.Get("/sites/:key/checks", checksHandler)
+	e.Delete("/sites/:key", deleteSiteHandler)
 	e.Run(":" + serverPort)
 }
 
-func loadSites() ([]Site, error) {
+func loadSites() (map[string]Site, error) {
 	var sites []Site
+	sitesMap := make(map[string]Site)
 	_, err := db.Select(&sites, "SELECT * FROM sites ORDER BY CreatedAt DESC")
-	return sites, err
+	if err != nil {
+		return sitesMap, err
+	}
+
+	for _, site := range sites {
+		sitesMap[site.Id] = site
+	}
+
+	return sitesMap, err
 }
 
 func setupDb() *gorp.DbMap {
