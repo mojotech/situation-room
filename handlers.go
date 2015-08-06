@@ -41,6 +41,7 @@ func createSiteHandler(c *echo.Context) error {
 	site.HashId()
 	site.URL = strings.TrimSpace(site.URL)
 	site.Email = strings.ToLower(strings.TrimSpace(site.Email))
+	site.Duration = site.Duration
 	site.CreatedAt = time.Now()
 	site.UpdatedAt = time.Now()
 
@@ -54,8 +55,6 @@ func createSiteHandler(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Problem saving your new site")
 	}
 
-	go siteCheck(site)
-	AllSites[site.Id] = site
 	return c.JSON(http.StatusCreated, site)
 }
 
@@ -108,9 +107,5 @@ func removeSite(Id string) error {
 	}
 
 	_, err = db.Exec("DELETE FROM checks WHERE siteId=$1", Id)
-
-	if err == nil {
-		delete(AllSites, Id)
-	}
 	return err
 }

@@ -11,6 +11,7 @@ type Site struct {
 	URL       string    `json:"url"`
 	Email     string    `json:"email"`
 	Status    string    `json:"status"`
+	Duration  float64   `json:"duration"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }
