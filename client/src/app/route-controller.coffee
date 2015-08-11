@@ -2,6 +2,7 @@ $ = require('jquery')
 Marionette = require('backbone.marionette')
 ListSitesView = require('./views/list-sites')
 SiteStatusesView = require('./views/site-statuses')
+SiteCollection = require('./collections/site-collection')
 StatusCollection = require('./collections/status-collection')
 FormView = require('./views/form')
 SiteModel = require('./models/site')
@@ -20,13 +21,16 @@ module.exports = Marionette.Object.extend(
     showInRoot(new FormView())
 
   listSites: ->
-    showInRoot(new ListSitesView())
+    siteCollection = new SiteCollection()
+    siteCollection.fetch(
+      success: ->
+        showInRoot(new ListSitesView(collection: siteCollection))
+    )
 
   viewSite: (id) ->
-    statusCollection = new StatusCollection(key: id)
+    statusCollection = new StatusCollection()
     statusCollection.url = "/sites/#{id}/checks"
     statusCollection.fetch(
-      reset: true
       success: ->
         showInRoot(new SiteStatusesView(collection: statusCollection))
     )
