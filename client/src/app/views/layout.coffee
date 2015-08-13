@@ -1,10 +1,9 @@
 $ = require('jquery')
 Marionette = require('backbone.marionette')
-template = require('../templates/layout.jade')
 
 module.exports = Marionette.LayoutView.extend(
   el: 'body'
-  template: template
+  template: require('../templates/layout.jade')
   regions:
     'root': '#content'
 )
