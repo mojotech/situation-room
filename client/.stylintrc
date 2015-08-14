@@ -1,27 +1,28 @@
 {
-  "colons" : {
-    "expect" : "always",
-    "error" : true
+  "colons": {
+    "expect": "never",
+    "error": true
   },
+  "indentPref": 2,
   "namingConvention": {
-    "expect" : "lowercase-dash",
-    "error" : true
+    "expect": "lowercase-dash",
+    "error": true
   },
-  "namingConventionStrict" : true,
-  "quotePref" : {
-    "expect" : "single",
-    "error" : true
+  "namingConventionStrict": true,
+  "quotePref": {
+    "expect": "single",
+    "error": true
   },
   "semicolons": {
-    "expect" : "never",
-    "error" : true
+    "expect": "never",
+    "error": true
   },
-  "trailingWhitespace" : {
-    "expect" : "never",
-    "error" : true
+  "trailingWhitespace": {
+    "expect": "never",
+    "error": true
   },
-  "zeroUnits" : {
-    "expect" : "never",
-    "error" : true
+  "zeroUnits": {
+    "expect": "never",
+    "error": true
   }
 }
