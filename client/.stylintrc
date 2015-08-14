@@ -1,9 +1,10 @@
 {
   "colons" : {
-    "expect" : "always",
+    "expect" : "never",
     "error" : true
   },
-  "namingConvention": {
+  "indentPref" : 2,
+  "namingConvention" : {
     "expect" : "lowercase-dash",
     "error" : true
   },
@@ -12,7 +13,7 @@
     "expect" : "single",
     "error" : true
   },
-  "semicolons": {
+  "semicolons" : {
     "expect" : "never",
     "error" : true
   },
