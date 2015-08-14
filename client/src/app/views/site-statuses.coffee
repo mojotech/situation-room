@@ -1,11 +1,11 @@
-$ = require('jquery')
-Marionette = require('backbone.marionette')
-StatusView = require('./status')
-NoSitesView = require('./no-sites')
+$ = require("jquery")
+Marionette = require("backbone.marionette")
+StatusView = require("./status")
+NoSitesView = require("./no-sites")
 
 module.exports = Marionette.CompositeView.extend(
   childView: StatusView
-  childViewContainer: 'tbody'
+  childViewContainer: "tbody"
   emptyView: NoSitesView
-  template: require('../templates/list-statuses.jade')
+  template: require("../templates/list-statuses.jade")
 )

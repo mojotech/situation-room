@@ -1,11 +1,11 @@
-$ = require('jquery')
-Marionette = require('backbone.marionette')
-ListSitesView = require('./views/list-sites')
-SiteStatusesView = require('./views/site-statuses')
-StatusCollection = require('./collections/status-collection')
-FormView = require('./views/form')
-SiteModel = require('./models/site')
-Layout = require('./views/layout')
+$ = require("jquery")
+Marionette = require("backbone.marionette")
+ListSitesView = require("./views/list-sites")
+SiteStatusesView = require("./views/site-statuses")
+StatusCollection = require("./collections/status-collection")
+FormView = require("./views/form")
+SiteModel = require("./models/site")
+Layout = require("./views/layout")
 layout = new Layout()
 layout.render()
 
@@ -14,7 +14,7 @@ showInRoot = (view) ->
 
 module.exports = Marionette.Object.extend(
   index: ->
-    $('#content').empty()
+    $("#content").empty()
 
   createSite: ->
     showInRoot(new FormView())
