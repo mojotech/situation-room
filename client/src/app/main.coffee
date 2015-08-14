@@ -2,6 +2,8 @@ Backbone = require('backbone')
 Router = require('./router')
 Marionette = require('backbone.marionette')
 
+require("../styles/main.styl")
+
 app = new Marionette.Application()
 
 app.on 'start', ->
