@@ -5,7 +5,7 @@
   "main": "index.html",
   "scripts": {
     "start": "gulp",
-    "test": "stylint src/styles"
+    "test": "gulp test"
   },
   "devDependencies": {
     "autoprefixer-loader": "^2.0.0",
