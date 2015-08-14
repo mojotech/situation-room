@@ -64,6 +64,17 @@ gulp.task('static', function(cb) {
     .pipe(gulp.dest(dest + 'static/'));
 });
 
+gulp.task('coffeelint', function () {
+  return gulp.src(src + 'app/**/*.coffee')
+    .pipe($.coffeelint())
+    .pipe($.coffeelint.reporter());
+});
+
+gulp.task('stylint', function () {
+  return gulp.src(src + 'styles/*.styl')
+    .pipe($.stylint());
+});
+
 gulp.task('watch', function() {
   gulp.watch(src + 'index.html', ['main-template']);
   gulp.watch(src + 'app/**/*.coffee', ['scripts']);
@@ -75,6 +86,7 @@ gulp.task('clean', function(cb) {
 
 // by default build project and then watch files in order to trigger livereload
 gulp.task('default', ['build', 'serve', 'watch']);
+gulp.task('test', ['coffeelint', 'stylint']);
 
 // waits until clean is finished then builds the project
 gulp.task('build', ['clean'], function(){
