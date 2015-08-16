@@ -6,3 +6,4 @@ NOTES.md
 gin-bin
 client/node_modules
 client/public
+client/tests_output
