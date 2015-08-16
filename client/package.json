@@ -9,6 +9,7 @@
   },
   "devDependencies": {
     "autoprefixer-loader": "^2.0.0",
+    "chromedriver": "^2.16.0",
     "coffee-loader": "^0.7.2",
     "connect-modrewrite": "^0.8.1",
     "css-loader": "^0.16.0",
@@ -21,6 +22,7 @@
     "gulp-jade": "^1.0.1",
     "gulp-livereload": "^3.7.0",
     "gulp-load-plugins": "^0.8.0",
+    "gulp-nightwatch": "^0.2.2",
     "gulp-size": "^1.2.0",
     "gulp-stylus": "^2.0.0",
     "gulp-uglifyjs": "^0.6.0",
@@ -30,8 +32,8 @@
     "jade": "^1.11.0",
     "jade-loader": "^0.7.1",
     "style-loader": "^0.12.3",
-    "stylint": "git://github.com/anthonyjruffa/stylint.git#joey-dev",
     "stylus-loader": "^1.2.1",
+    "selenium-server": "^2.47.1",
     "webpack": "^1.5.3",
     "webpack-dev-middleware": "^1.0.11"
   },
