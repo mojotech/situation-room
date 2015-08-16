@@ -96,6 +96,18 @@ gulp.task('stylint', function () {
     .pipe($.stylint());
 });
 
+gulp.task('nightwatch', function () {
+  return gulp.src('')
+    .pipe($.nightwatch());
+});
+
+gulp.task('nightwatch-chrome', function () {
+  return gulp.src('')
+    .pipe($.nightwatch({
+      cliArgs: ['-e chrome']
+    }));
+});
+
 gulp.task('watch', function() {
   gulp.watch(src + 'styles/*.styl', ['styles']);
   gulp.watch(src + 'app/templates/*.jade', ['jade']);
@@ -109,7 +121,7 @@ gulp.task('clean', function(cb) {
 
 // by default build project and then watch files in order to trigger livereload
 gulp.task('default', ['build', 'serve', 'watch']);
-gulp.task('test', ['coffeelint', 'stylint']);
+gulp.task('test', ['coffeelint', 'stylint', 'nightwatch']);
 
 // waits until clean is finished then builds the project
 gulp.task('build', ['clean'], function(){
