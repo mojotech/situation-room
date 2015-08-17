@@ -7,5 +7,6 @@ module.exports = Marionette.AppRouter.extend(
     'sites/new': 'createSite'
     'sites': 'listSites'
     'sites/:id/checks': 'viewSite'
+    "sites/:id/chart": "viewChart"
     '': 'index'
 )

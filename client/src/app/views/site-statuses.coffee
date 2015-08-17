@@ -8,4 +8,7 @@ module.exports = Marionette.CompositeView.extend(
   childViewContainer: 'tbody'
   emptyView: NoSitesView
   template: require('../templates/list-statuses.jade')
+
+  templateHelpers: ->
+    siteKey: @collection.url.split('/')[2]
 )
