@@ -41,7 +41,7 @@ func createSiteHandler(c *echo.Context) error {
 	site.HashId()
 	site.URL = strings.TrimSpace(site.URL)
 	site.Email = strings.ToLower(strings.TrimSpace(site.Email))
-	site.Duration = site.Duration
+	site.Duration = time.Minute.Seconds()
 	site.CreatedAt = time.Now()
 	site.UpdatedAt = time.Now()
 
