@@ -1,0 +1,4 @@
+postgres:
+	url: postgres://egomdjdyrifmxp:UwaJnDfOsPAD7I5U-kJu4ZRepw@ec2-54-197-246-197.compute-1.amazonaws.com:5432/d2e65drvnae8r7
+sqlite3:
+	url: ./situation-room.bin
