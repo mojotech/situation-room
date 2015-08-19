@@ -1,13 +1,12 @@
 $ = require('jquery')
-Marionette = require('backbone.marionette')
 moment = require('moment')
+Marionette = require('backbone.marionette')
 StatusModel = require('../models/status')
-template = require('../templates/status.jade')
 
 module.exports = Marionette.ItemView.extend(
   model: new StatusModel({ parse: true })
   tagName: 'tr'
-  template: template
+  template: require('../templates/status.jade')
 
   templateHelpers: ->
     formattedTime: moment(new Date(@model.get('createdAt'))).fromNow()

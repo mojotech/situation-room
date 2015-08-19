@@ -1,20 +1,19 @@
 $ = require('jquery')
 Marionette = require('backbone.marionette')
-template = require('../templates/form.jade')
 SiteModel = require('../models/site')
 
 module.exports = Marionette.ItemView.extend(
   model: new SiteModel()
-  template: template
-  
+  template: require('../templates/form.jade')
+
   events:
     'submit form' : 'enterSite'
-  
+
   ui:
     url: '.url'
     email: '.email'
     form: '.site-form'
-  
+
   enterSite: (e) ->
     e.preventDefault()
     return unless @formIsValid()

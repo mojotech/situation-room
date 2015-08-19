@@ -41,14 +41,6 @@ gulp.task('main-template', function() {
     .pipe($.connect.reload());
 });
 
-gulp.task('jade', function() {
-  return gulp.src(src + 'app/templates/*.jade')
-    .pipe($.jade())
-    .pipe(gulp.dest(dest + 'html/'))
-    .pipe($.size({ title : 'html' }))
-    .pipe($.connect.reload());
-});
-
 gulp.task('styles',function(cb) {
   return gulp.src(src + 'styles/main.styl')
     .pipe($.stylus({
@@ -87,7 +79,6 @@ gulp.task('static', function(cb) {
 
 gulp.task('watch', function() {
   gulp.watch(src + 'styles/*.styl', ['styles']);
-  gulp.watch(src + 'app/templates/*.jade', ['jade']);
   gulp.watch(src + 'index.html', ['main-template']);
   gulp.watch(src + 'app/**/*.coffee', ['scripts']);
 });
@@ -101,5 +92,5 @@ gulp.task('default', ['build', 'serve', 'watch']);
 
 // waits until clean is finished then builds the project
 gulp.task('build', ['clean'], function(){
-  gulp.start(['static', 'jade', 'main-template', 'scripts', 'styles']);
+  gulp.start(['static', 'main-template', 'scripts', 'styles']);
 });

@@ -1,13 +1,12 @@
 $ = require('jquery')
-Marionette = require('backbone.marionette')
 moment = require('moment')
+Marionette = require('backbone.marionette')
 SiteModel = require('../models/site')
-template = require('../templates/site.jade')
 
 module.exports = Marionette.ItemView.extend(
   model: new SiteModel({ parse: true })
   tagName: 'tr'
-  template: template
+  template: require('../templates/site.jade')
 
   ui:
     destroy: '.delete'
@@ -19,7 +18,7 @@ module.exports = Marionette.ItemView.extend(
     formattedTime: moment(new Date(@model.get('createdAt'))).fromNow()
 
   confirmDelete: (e) ->
-    e.preventDefault() 
+    e.preventDefault()
     e.stopPropagation()
     if confirm 'Are you sure you want to remove this site?' then @model.destroy()
 )
