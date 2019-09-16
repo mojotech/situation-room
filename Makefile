@@ -1,4 +1,4 @@
-.PHONY: build gin deps test
+.PHONY: gin deps test
 
 build: *.go
 	go build -o build/situation-room
