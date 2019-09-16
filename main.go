@@ -26,22 +26,23 @@ func main() {
 
 	e := echo.New()
 	e.Use(mw.Logger())
-	e.Get("/sites", sitesHandler)
-	e.Post("/sites", createSiteHandler)
-	e.Get("/sites/:key", siteHandler)
-	e.Get("/sites/:key/checks", checksHandler)
-	e.Delete("/sites/:key", deleteSiteHandler)
+	e.GET("/sites", sitesHandler)
+	e.POST("/sites", createSiteHandler)
+	e.GET("/sites/:key", siteHandler)
+	e.GET("/sites/:key/checks", checksHandler)
+	e.DELETE("/sites/:key", deleteSiteHandler)
 
 	StartDispatcher()
 
-	e.Run(":" + serverPort)
+	// e.Run(":" + serverPort)
+	e.Logger.Fatal(e.Start(":" + serverPort))
 }
 
 func setupDb() *gorp.DbMap {
 	// Open SQLlite db connection
 	db, err := sql.Open("sqlite3", "./situation-room.bin")
 	if err != nil {
-		log.Fatalf("Failed to open database connection", err)
+		log.Fatalf("Failed to open database connection: %s", err)
 	}
 
 	dbmap := &gorp.DbMap{Db: db, Dialect: gorp.SqliteDialect{}}
@@ -51,7 +52,7 @@ func setupDb() *gorp.DbMap {
 
 	err = dbmap.CreateTablesIfNotExists()
 	if err != nil {
-		log.Fatalf("Failed to create tables", err)
+		log.Fatalf("Failed to create tables: %s", err)
 	}
 
 	return dbmap

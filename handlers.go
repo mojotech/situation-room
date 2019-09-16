@@ -12,7 +12,7 @@ import (
 // GET /sites
 // response:
 //   sites: <array> sites registered with the system
-func sitesHandler(c *echo.Context) error {
+func sitesHandler(c echo.Context) error {
 	var sites []Site
 
 	_, err := db.Select(&sites, "SELECT * FROM sites")
@@ -31,7 +31,7 @@ func sitesHandler(c *echo.Context) error {
 //
 // response:
 //   site: <json> newly created site info
-func createSiteHandler(c *echo.Context) error {
+func createSiteHandler(c echo.Context) error {
 	var site Site
 	err := c.Bind(&site)
 	if err != nil {
@@ -51,7 +51,7 @@ func createSiteHandler(c *echo.Context) error {
 
 	err = db.Insert(&site)
 	if err != nil {
-		log.Fatalf("Problem saving new site", err)
+		log.Fatalf("Problem saving new site: %s", err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "Problem saving your new site")
 	}
 
@@ -63,8 +63,8 @@ func createSiteHandler(c *echo.Context) error {
 // response:
 //	 site_key: <string> site hash key
 //	 statuses: <array> chronologically ordered status codes from recent checks
-func siteHandler(c *echo.Context) error {
-	siteKey := c.P(0)
+func siteHandler(c echo.Context) error {
+	siteKey := c.Param("key")
 	var site Site
 
 	err := db.SelectOne(&site, "SELECT * FROM sites WHERE id=$1", siteKey)
@@ -76,8 +76,8 @@ func siteHandler(c *echo.Context) error {
 }
 
 // GET /sites/:key/checks
-func checksHandler(c *echo.Context) error {
-	siteKey := c.P(0)
+func checksHandler(c echo.Context) error {
+	siteKey := c.Param("key")
 	var checks []Check
 
 	_, err := db.Select(&checks, "SELECT * FROM checks WHERE siteId=$1", siteKey)
@@ -89,8 +89,8 @@ func checksHandler(c *echo.Context) error {
 }
 
 // DELETE /sites/:key
-func deleteSiteHandler(c *echo.Context) error {
-	siteKey := c.P(0)
+func deleteSiteHandler(c echo.Context) error {
+	siteKey := c.Param("key")
 	err := removeSite(siteKey)
 
 	if err != nil {
