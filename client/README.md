@@ -1,21 +1,20 @@
 ### Situation Room Client
 
-The front end for the application, built using [Backbone Marionette][1]. Refer to the [docs here][2].
+The front end for the application, built using [Elm][1]. Refer to the [docs here][2].
 
 ## Requirements
 
-* [npm][3]
+* [elm][1]
 
 ## Setup
 
-- npm i
-- npm start
+> yarn install
+> yarn run parcel index.html
 
-This will start the application on port 1337.
+This will start the application on port 1234.
 
-The app will automatically reload upon making changes.
+The application will automatically reload upon making changes.
 
 
-[1]: http://www.marionettejs.com
-[2]: http://www.marionettejs.com/docs/current
-[3]: https://www.npmjs.com
+[1]: https://www.npmjs.com
+[2]: https://elm-lang.org/docs
