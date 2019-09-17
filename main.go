@@ -26,6 +26,10 @@ func main() {
 
 	e := echo.New()
 	e.Use(mw.Logger())
+	e.Use(mw.CORSWithConfig(mw.CORSConfig{
+		AllowOrigins: []string{"*"},
+		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+	}))
 	e.GET("/sites", sitesHandler)
 	e.POST("/sites", createSiteHandler)
 	e.GET("/sites/:key", siteHandler)
