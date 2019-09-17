@@ -5,8 +5,8 @@ import Html exposing (..)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import Http
-import Json.Decode exposing (Decoder, int, list, string, succeed)
-import Json.Decode.Pipeline exposing (optional, required)
+import Json.Decode exposing (Decoder, float, int, list, string, succeed)
+import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 
 
 apiUrlPrefix : String
@@ -17,6 +17,7 @@ apiUrlPrefix =
 type alias Model =
     { sites : List Site
     , status : Status
+    , activeSite : Maybe Site
     }
 
 
@@ -26,6 +27,16 @@ type alias Site =
     , email : String
     , status : String
     , duration : Int
+    , checks : List SiteCheck
+    }
+
+
+type alias SiteCheck =
+    { id : Int
+    , response : Float
+    , siteId : String
+    , url : String
+    , createdAt : String
     }
 
 
@@ -33,6 +44,8 @@ type Msg
     = FetchSites
     | SitesFetched (Result Http.Error (List Site))
     | FetchSite Site
+    | SiteChecksFetched (Result Http.Error (List SiteCheck))
+    | ShowSiteDetails Site
     | Noop
 
 
@@ -51,7 +64,10 @@ view model =
                 [ text "Fetch Sites List" ]
             ]
         , div [ class "content" ]
-            [ viewSitesList model ]
+            [ viewSitesList model
+            , hr [] []
+            , viewSiteDetails model.activeSite
+            ]
         ]
 
 
@@ -77,8 +93,46 @@ viewSitesList model =
 
 viewSiteCard : Site -> Html Msg
 viewSiteCard site =
-    div [ class "site-card" ]
+    div [ class "site-card", onClick (ShowSiteDetails site) ]
         [ text site.url ]
+
+
+viewSiteDetails : Maybe Site -> Html Msg
+viewSiteDetails maybeSite =
+    case maybeSite of
+        Just site ->
+            div [ class "site-details" ]
+                [ table []
+                    [ thead []
+                        [ tr []
+                            [ th [] [ text "Tested" ]
+                            , th [] [ text "Code" ]
+                            ]
+                        ]
+                    , tbody [] (List.map siteCheckTableRow site.checks)
+                    ]
+                ]
+
+        Nothing ->
+            div [ class "site-details empty" ] []
+
+
+siteCheckTableRow : SiteCheck -> Html Msg
+siteCheckTableRow siteCheck =
+    tr []
+        [ td [] [ text siteCheck.createdAt ]
+        , td [] [ text (String.fromFloat siteCheck.response) ]
+        ]
+
+
+siteCheckDecoder : Decoder SiteCheck
+siteCheckDecoder =
+    succeed SiteCheck
+        |> required "id" int
+        |> required "response" float
+        |> required "siteId" string
+        |> required "url" string
+        |> required "createdAt" string
 
 
 siteDecoder : Decoder Site
@@ -89,6 +143,15 @@ siteDecoder =
         |> required "email" string
         |> optional "status" string ""
         |> required "duration" int
+        |> hardcoded []
+
+
+fetchSiteChecksCmd : Site -> Cmd Msg
+fetchSiteChecksCmd site =
+    Http.get
+        { url = apiUrlPrefix ++ "/sites/" ++ site.id ++ "/checks"
+        , expect = Http.expectJson SiteChecksFetched (list siteCheckDecoder)
+        }
 
 
 fetchSitesCmd : Cmd Msg
@@ -127,15 +190,33 @@ update msg model =
                         Http.BadBody body ->
                             ( { model | status = Errored ("Bad Body: " ++ body) }, Cmd.none )
 
-        -- _ ->
-        --     ( { model | status = Errored "Server error!" }, Cmd.none )
+        ShowSiteDetails site ->
+            ( { model | activeSite = Just site }, fetchSiteChecksCmd site )
+
+        SiteChecksFetched result ->
+            case result of
+                Ok siteChecks ->
+                    case model.activeSite of
+                        Just activeSite ->
+                            let
+                                updatedSite =
+                                    { activeSite | checks = siteChecks }
+                            in
+                            ( { model | activeSite = Just updatedSite }, Cmd.none )
+
+                        Nothing ->
+                            ( model, Cmd.none )
+
+                Err httpError ->
+                    ( { model | status = Errored "Failed to load site checks..." }, Cmd.none )
+
         _ ->
             ( model, Cmd.none )
 
 
 initialModel : Model
 initialModel =
-    { sites = [], status = NotLoaded }
+    { sites = [], status = NotLoaded, activeSite = Nothing }
 
 
 initialCmd : Cmd Msg
