@@ -12,8 +12,8 @@ type Site struct {
 	Email     string    `json:"email"`
 	Status    string    `json:"status"`
 	Duration  float64   `json:"duration"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	CreatedAt time.Time `json:"-"`
+	UpdatedAt time.Time `json:"-"`
 }
 
 func (s *Site) HashId() string {
