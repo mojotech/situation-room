@@ -80,7 +80,7 @@ func checksHandler(c echo.Context) error {
 	siteKey := c.Param("key")
 	var checks []Check
 
-	_, err := db.Select(&checks, "SELECT * FROM checks WHERE siteId=$1", siteKey)
+	_, err := db.Select(&checks, "SELECT * FROM checks WHERE siteId=$1 ORDER BY createdAt DESC LIMIT 180", siteKey)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, "No checks found for site")
 	}
