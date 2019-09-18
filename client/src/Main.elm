@@ -34,6 +34,7 @@ type alias Site =
 type alias SiteCheck =
     { id : Int
     , response : Float
+    , responseTime : Int
     , siteId : String
     , url : String
     , createdAt : String
@@ -107,6 +108,7 @@ viewSiteDetails maybeSite =
                         [ tr []
                             [ th [] [ text "Tested" ]
                             , th [] [ text "Code" ]
+                            , th [] [ text "Response Time" ]
                             ]
                         ]
                     , tbody [] (List.map siteCheckTableRow site.checks)
@@ -122,6 +124,7 @@ siteCheckTableRow siteCheck =
     tr []
         [ td [] [ text siteCheck.createdAt ]
         , td [] [ text (String.fromFloat siteCheck.response) ]
+        , td [] [ text (String.fromInt siteCheck.responseTime) ]
         ]
 
 
@@ -130,6 +133,7 @@ siteCheckDecoder =
     succeed SiteCheck
         |> required "id" int
         |> required "response" float
+        |> required "responseTime" int
         |> required "siteId" string
         |> required "url" string
         |> required "createdAt" string
