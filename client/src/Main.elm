@@ -119,17 +119,6 @@ viewSiteDetails maybeSite =
             div [ class "site-details" ]
                 [ h2 [] [ text site.url ]
                 , viewSiteChecksChart site.checks
-                , LineChart.view1 (\c -> toFloat c.createdAt) (\c -> toFloat c.responseTime) site.checks
-                , table []
-                    [ thead []
-                        [ tr []
-                            [ th [] [ text "Tested" ]
-                            , th [] [ text "Code" ]
-                            , th [] [ text "Response Time" ]
-                            ]
-                        ]
-                    , tbody [] (List.map siteCheckTableRow site.checks)
-                    ]
                 ]
 
         Nothing ->
@@ -156,15 +145,6 @@ chartConfig =
     , line = LCLine.default
     , dots = LCDots.custom (LCDots.empty 5 1)
     }
-
-
-siteCheckTableRow : SiteCheck -> Html Msg
-siteCheckTableRow siteCheck =
-    tr []
-        [ td [] [ text (String.fromInt siteCheck.createdAt) ]
-        , td [] [ text (String.fromFloat siteCheck.response) ]
-        , td [] [ text (String.fromInt siteCheck.responseTime) ]
-        ]
 
 
 siteCheckDecoder : Decoder SiteCheck
