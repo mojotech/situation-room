@@ -37,7 +37,7 @@ type alias SiteCheck =
     , responseTime : Int
     , siteId : String
     , url : String
-    , createdAt : String
+    , createdAt : Int
     }
 
 
@@ -122,7 +122,7 @@ viewSiteDetails maybeSite =
 siteCheckTableRow : SiteCheck -> Html Msg
 siteCheckTableRow siteCheck =
     tr []
-        [ td [] [ text siteCheck.createdAt ]
+        [ td [] [ text (String.fromInt siteCheck.createdAt) ]
         , td [] [ text (String.fromFloat siteCheck.response) ]
         , td [] [ text (String.fromInt siteCheck.responseTime) ]
         ]
@@ -136,7 +136,7 @@ siteCheckDecoder =
         |> required "responseTime" int
         |> required "siteId" string
         |> required "url" string
-        |> required "createdAt" string
+        |> required "createdAt" int
 
 
 siteDecoder : Decoder Site

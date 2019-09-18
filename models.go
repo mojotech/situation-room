@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/md5"
+	"encoding/json"
 	"fmt"
 	"time"
 )
@@ -30,4 +31,16 @@ type Check struct {
 	ResponseTime int64     `json:"responseTime"`
 	SiteId       string    `json:"siteId"`
 	CreatedAt    time.Time `json:"createdAt"`
+}
+
+// Customize the JSON marshaling of our time.Time fields
+func (c *Check) MarshalJSON() ([]byte, error) {
+	type Alias Check
+	return json.Marshal(&struct {
+		CreatedAt int64 `json:"createdAt"`
+		*Alias
+	}{
+		CreatedAt: c.CreatedAt.Unix(),
+		Alias:     (*Alias)(c),
+	})
 }
