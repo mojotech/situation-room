@@ -44,7 +44,7 @@ func main() {
 
 func setupDb() *gorp.DbMap {
 	// Open SQLlite db connection
-	db, err := sql.Open("sqlite3", "./situation-room.bin")
+	db, err := sql.Open("sqlite3", "./situation-room.db.bin")
 	if err != nil {
 		log.Fatalf("Failed to open database connection: %s", err)
 	}
