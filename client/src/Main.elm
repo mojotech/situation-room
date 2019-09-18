@@ -11,7 +11,7 @@ import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 
 apiUrlPrefix : String
 apiUrlPrefix =
-    "http://localhost:8888"
+    "http://localhost:4567"
 
 
 type alias Model =
