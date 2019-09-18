@@ -7,6 +7,7 @@ import Html.Events exposing (onClick)
 import Http
 import Json.Decode exposing (Decoder, float, int, list, string, succeed)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
+import LineChart
 
 
 apiUrlPrefix : String
@@ -103,7 +104,9 @@ viewSiteDetails maybeSite =
     case maybeSite of
         Just site ->
             div [ class "site-details" ]
-                [ table []
+                [ h2 [] [ text site.url ]
+                , LineChart.view1 (\c -> toFloat c.createdAt) (\c -> toFloat c.responseTime) site.checks
+                , table []
                     [ thead []
                         [ tr []
                             [ th [] [ text "Tested" ]
