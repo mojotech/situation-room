@@ -117,7 +117,7 @@ viewSiteDetails maybeSite =
     case maybeSite of
         Just site ->
             div [ class "site-details" ]
-                [ h2 [] [ text site.url ]
+                [ h2 [] [ text (site.url ++ " - " ++ site.status) ]
                 , viewSiteChecksChart site.checks
                 ]
 
