@@ -127,7 +127,7 @@ viewSiteDetails maybeSite =
 
 viewSiteChecksChart : List SiteCheck -> Html Msg
 viewSiteChecksChart checks =
-    LineChart.viewCustom chartConfig [ LineChart.line LCColors.blue LCDots.circle "SITE" checks ]
+    LineChart.viewCustom chartConfig [ LineChart.line LCColors.blue LCDots.circle "" checks ]
 
 
 chartConfig : LineChart.Config SiteCheck Msg
@@ -137,7 +137,7 @@ chartConfig =
     , container = LCContainer.default "uptime"
     , interpolation = LCInterpolation.monotone
     , intersection = LCIntersection.default
-    , legends = LCLegends.default
+    , legends = LCLegends.none
     , events = LCEvents.default
     , junk = LCJunk.default
     , grid = LCGrid.dots 1 LCColors.gray
