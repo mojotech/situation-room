@@ -11,6 +11,11 @@ import LineChart
 import LineChart.Area as LCArea
 import LineChart.Axis as LCAxis
 import LineChart.Axis.Intersection as LCIntersection
+import LineChart.Axis.Line as LCAxisLine
+import LineChart.Axis.Range as LCAxisRange
+import LineChart.Axis.Tick as LCAxisTick
+import LineChart.Axis.Ticks as LCAxisTicks
+import LineChart.Axis.Title as LCAxisTitle
 import LineChart.Colors as LCColors
 import LineChart.Container as LCContainer
 import LineChart.Dots as LCDots
@@ -21,6 +26,7 @@ import LineChart.Junk as LCJunk
 import LineChart.Legends as LCLegends
 import LineChart.Line as LCLine
 import Time
+import Time.Format as TimeFormat
 
 
 apiUrlPrefix : String
@@ -47,11 +53,11 @@ type alias Site =
 
 type alias SiteCheck =
     { id : Int
-    , response : Float
-    , responseTime : Int
+    , response : Int
+    , responseTime : Float
     , siteId : String
     , url : String
-    , createdAt : Int
+    , createdAt : Time.Posix -- Int
     }
 
 
@@ -130,32 +136,83 @@ viewSiteChecksChart checks =
     LineChart.viewCustom chartConfig [ LineChart.line LCColors.blue LCDots.circle "" checks ]
 
 
+
+-- , x = LCAxis.time Time.utc 1270 "Time" (toFloat << .createdAt)
+--
+-- , x = LCAxis.default 1270 "Time" (toFloat << Time.posixToMillis << .createdAt)
+-- , x = LCAxis.time Time.utc 1270 "Time" (toFloat << Time.posixToMillis << .createdAt)
+-- , x = customAxis
+
+
 chartConfig : LineChart.Config SiteCheck Msg
 chartConfig =
-    { y = LCAxis.full 450 "Response Time in ms" (\c -> toFloat c.responseTime)
-    , x = LCAxis.time Time.utc 1270 "Time" (\c -> toFloat c.createdAt)
+    { y = LCAxis.full 450 "Response Time in ms" .responseTime
+    , x = LCAxis.time Time.utc 1270 "Time" (toFloat << Time.posixToMillis << .createdAt)
     , container = LCContainer.default "uptime"
     , interpolation = LCInterpolation.monotone
     , intersection = LCIntersection.default
     , legends = LCLegends.none
     , events = LCEvents.default
     , junk = LCJunk.default
-    , grid = LCGrid.dots 1 LCColors.gray
+    , grid = LCGrid.lines 0.3 LCColors.gray
     , area = LCArea.normal 1.0
     , line = LCLine.default
     , dots = LCDots.custom (LCDots.empty 5 1)
     }
 
 
+
+-- , variable = Just << (toFloat << .createdAt)
+-- , ticks = LCAxisTicks.time Time.utc 8
+
+
+customAxis : LCAxis.Config SiteCheck msg
+customAxis =
+    LCAxis.custom
+        { title = LCAxisTitle.default "Time"
+        , variable = Just << (toFloat << Time.posixToMillis << .createdAt)
+        , pixels = 1270
+        , range = LCAxisRange.padded 20 20
+        , axisLine = LCAxisLine.rangeFrame LCColors.gray
+        , ticks = LCAxisTicks.timeCustom Time.utc 8 customTimeTick
+        }
+
+
+customTimeTick : LCAxisTick.Time -> LCAxisTick.Config msg
+customTimeTick timestamp =
+    let
+        formattedTime =
+            TimeFormat.format Time.utc "padHour:padMinute:padSecond" (Time.posixToMillis timestamp.timestamp)
+
+        label =
+            LCJunk.label LCColors.black formattedTime
+    in
+    LCAxisTick.custom
+        { position = toFloat <| Time.posixToMillis timestamp.timestamp
+        , color = LCColors.gray
+        , width = 1
+        , length = 7
+        , grid = True
+        , direction = LCAxisTick.negative
+        , label = Just label
+        }
+
+
+timestampDecoder : Decoder Time.Posix
+timestampDecoder =
+    -- The API gives a timestamp in seconds, not milliseconds
+    Json.Decode.map (\ts -> Time.millisToPosix (ts * 1000)) int
+
+
 siteCheckDecoder : Decoder SiteCheck
 siteCheckDecoder =
     succeed SiteCheck
         |> required "id" int
-        |> required "response" float
-        |> required "responseTime" int
+        |> required "response" int
+        |> required "responseTime" float
         |> required "siteId" string
         |> required "url" string
-        |> required "createdAt" int
+        |> required "createdAt" timestampDecoder
 
 
 siteDecoder : Decoder Site
@@ -242,7 +299,6 @@ initialModel =
     { sites = [], status = NotLoaded, activeSite = Nothing }
 
 
-initialCmd : Cmd Msg
 initialCmd =
     Cmd.none
 

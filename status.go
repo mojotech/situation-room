@@ -35,6 +35,7 @@ func checkSiteStatus(s Site) {
 			s.Status = ErrorStatus
 			_, _ = db.Update(&s)
 		}
+		// 2019/09/19 11:17:33 [ERROR] Problem creating new HTTP request: dial tcp: lookup api2.mojotech.com: no such host
 		log.Println("[ERROR] Problem creating new HTTP request:", err.Error())
 		return
 	}
