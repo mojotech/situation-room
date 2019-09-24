@@ -8,14 +8,14 @@ checks like load times, page load sizes, etc... will be added.
 
 ## Requirements
 
-* [go][4]
+* [go][4] - 1.11 or newer
 
 ### Optional
 
 * [sqlite][5]
-* [postgresql][7]
-* [mysql][6]
-* [redis][3]
+* [postgresql][7] - not yet supported
+* [mysql][6] - not yet supported
+* [redis][3] - not yet supported
 
 
 ## Development
