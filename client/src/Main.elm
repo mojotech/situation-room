@@ -18,6 +18,7 @@ import LineChart.Axis.Ticks as LCAxisTicks
 import LineChart.Axis.Title as LCAxisTitle
 import LineChart.Colors as LCColors
 import LineChart.Container as LCContainer
+import LineChart.Coordinate as LCCoordinate
 import LineChart.Dots as LCDots
 import LineChart.Events as LCEvents
 import LineChart.Grid as LCGrid
@@ -38,6 +39,7 @@ type alias Model =
     { sites : List Site
     , status : Status
     , activeSite : Maybe Site
+    , hoveredSiteCheck : Maybe SiteCheck
     }
 
 
@@ -57,7 +59,7 @@ type alias SiteCheck =
     , responseTime : Float
     , siteId : String
     , url : String
-    , createdAt : Time.Posix -- Int
+    , createdAt : Time.Posix
     }
 
 
@@ -67,6 +69,7 @@ type Msg
     | FetchSite Site
     | SiteChecksFetched (Result Http.Error (List SiteCheck))
     | ShowSiteDetails Site
+    | HoverSiteCheck (Maybe SiteCheck)
     | Noop
 
 
@@ -87,7 +90,7 @@ view model =
         , div [ class "content" ]
             [ viewSitesList model
             , hr [] []
-            , viewSiteDetails model.activeSite
+            , viewSiteDetails model
             ]
         ]
 
@@ -118,42 +121,39 @@ viewSiteCard site =
         [ text site.url ]
 
 
-viewSiteDetails : Maybe Site -> Html Msg
-viewSiteDetails maybeSite =
-    case maybeSite of
+viewSiteDetails : Model -> Html Msg
+viewSiteDetails model =
+    case model.activeSite of
         Just site ->
             div [ class "site-details" ]
                 [ h2 [] [ text (site.url ++ " - " ++ site.status) ]
-                , viewSiteChecksChart site.checks
+                , viewSiteChecksChart model
                 ]
 
         Nothing ->
             div [ class "site-details empty" ] []
 
 
-viewSiteChecksChart : List SiteCheck -> Html Msg
-viewSiteChecksChart checks =
-    LineChart.viewCustom chartConfig [ LineChart.line LCColors.blue LCDots.circle "" checks ]
+viewSiteChecksChart : Model -> Html Msg
+viewSiteChecksChart model =
+    case model.activeSite of
+        Just site ->
+            LineChart.viewCustom (chartConfig model) [ LineChart.line LCColors.blue LCDots.circle "" site.checks ]
+
+        Nothing ->
+            div [ class "site-shart empty" ] []
 
 
-
--- , x = LCAxis.time Time.utc 1270 "Time" (toFloat << .createdAt)
---
--- , x = LCAxis.default 1270 "Time" (toFloat << Time.posixToMillis << .createdAt)
--- , x = LCAxis.time Time.utc 1270 "Time" (toFloat << Time.posixToMillis << .createdAt)
--- , x = customAxis
-
-
-chartConfig : LineChart.Config SiteCheck Msg
-chartConfig =
+chartConfig : Model -> LineChart.Config SiteCheck Msg
+chartConfig model =
     { y = LCAxis.full 450 "Response Time in ms" .responseTime
     , x = LCAxis.time Time.utc 1270 "Time" (toFloat << Time.posixToMillis << .createdAt)
     , container = LCContainer.default "uptime"
     , interpolation = LCInterpolation.monotone
     , intersection = LCIntersection.default
     , legends = LCLegends.none
-    , events = LCEvents.default
-    , junk = LCJunk.default
+    , events = LCEvents.hoverOne HoverSiteCheck
+    , junk = viewSiteCheckJunk model
     , grid = LCGrid.lines 0.3 LCColors.gray
     , area = LCArea.normal 1.0
     , line = LCLine.default
@@ -161,9 +161,21 @@ chartConfig =
     }
 
 
+viewSiteCheckJunk : Model -> LCJunk.Config SiteCheck msg
+viewSiteCheckJunk model =
+    case model.hoveredSiteCheck of
+        Nothing ->
+            LCJunk.default
 
--- , variable = Just << (toFloat << .createdAt)
--- , ticks = LCAxisTicks.time Time.utc 8
+        Just _ ->
+            LCJunk.hoverOne model.hoveredSiteCheck [ ( "Timestamp", formattedJunkTimestamp << .createdAt ), ( "Response Time in ms", String.fromFloat << .responseTime ) ]
+
+
+formattedJunkTimestamp : Time.Posix -> String
+formattedJunkTimestamp timestamp =
+    timestamp
+        |> Time.posixToMillis
+        |> TimeFormat.format Time.utc "Weekday, Month Day, Year padHour:padMinute"
 
 
 customAxis : LCAxis.Config SiteCheck msg
@@ -290,13 +302,16 @@ update msg model =
                 Err httpError ->
                     ( { model | status = Errored "Failed to load site checks..." }, Cmd.none )
 
+        HoverSiteCheck coordinatePoint ->
+            ( { model | hoveredSiteCheck = coordinatePoint }, Cmd.none )
+
         _ ->
             ( model, Cmd.none )
 
 
 initialModel : Model
 initialModel =
-    { sites = [], status = NotLoaded, activeSite = Nothing }
+    { sites = [], status = NotLoaded, activeSite = Nothing, hoveredSiteCheck = Nothing }
 
 
 initialCmd =
