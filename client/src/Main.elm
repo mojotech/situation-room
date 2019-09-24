@@ -1,6 +1,8 @@
 module Main exposing (main)
 
 import Browser
+import Element exposing (Element, column, el, padding, row)
+import Element.Font as Font
 import Html exposing (..)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
@@ -82,17 +84,18 @@ type Status
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ div [ class "controls" ]
-            [ button [ onClick FetchSites ]
-                [ text "Fetch Sites List" ]
+    Element.layout [ padding 20, Font.size 14 ]
+        (column
+            []
+            [ Element.html
+                (button [ onClick FetchSites ]
+                    [ text "Fetch Sites List" ]
+                )
+            , Element.html (viewSitesList model)
+            , Element.html (hr [] [])
+            , Element.html (viewSiteDetails model)
             ]
-        , div [ class "content" ]
-            [ viewSitesList model
-            , hr [] []
-            , viewSiteDetails model
-            ]
-        ]
+        )
 
 
 viewSitesList : Model -> Html Msg
@@ -168,7 +171,11 @@ viewSiteCheckJunk model =
             LCJunk.default
 
         Just _ ->
-            LCJunk.hoverOne model.hoveredSiteCheck [ ( "Timestamp", formattedJunkTimestamp << .createdAt ), ( "Response Time in ms", String.fromFloat << .responseTime ) ]
+            LCJunk.hoverOne model.hoveredSiteCheck
+                [ ( "Timestamp", formattedJunkTimestamp << .createdAt )
+                , ( "Response Time in ms", String.fromFloat << .responseTime )
+                , ( "Status Code", String.fromInt << .response )
+                ]
 
 
 formattedJunkTimestamp : Time.Posix -> String
