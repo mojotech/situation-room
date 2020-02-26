@@ -5,11 +5,12 @@ import Element exposing (Element, column, el, padding, row)
 import Element.Font as Font
 import Flip exposing (flip)
 import Html exposing (..)
-import Html.Attributes exposing (class)
-import Html.Events exposing (onClick)
+import Html.Attributes exposing (class, disabled, for, type_, value)
+import Html.Events exposing (onClick, onInput, onSubmit)
 import Http
 import Json.Decode exposing (Decoder, float, int, list, string, succeed)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
+import Json.Encode as Encode
 import LineChart
 import LineChart.Area as LCArea
 import LineChart.Axis as LCAxis
@@ -43,7 +44,18 @@ type alias Model =
     , status : Status
     , activeSite : Maybe Site
     , hoveredSiteCheck : Maybe SiteCheck
+    , addSiteForm : AddSiteForm
     }
+
+
+setAddSiteForm : AddSiteForm -> Model -> Model
+setAddSiteForm newaddSiteForm model =
+    { model | addSiteForm = newaddSiteForm }
+
+
+asAddSiteFormIn : Model -> AddSiteForm -> Model
+asAddSiteFormIn =
+    flip setAddSiteForm
 
 
 setSites : List Site -> Model -> Model
@@ -86,6 +98,33 @@ setSiteChecks newSiteChecks site =
     { site | checks = newSiteChecks }
 
 
+type alias AddSiteForm =
+    { url : String
+    , email : String
+    , status : Status
+    }
+
+
+type AddSiteFormEditableKeys
+    = Email
+    | Url
+
+
+setAddSiteUrl : String -> AddSiteForm -> AddSiteForm
+setAddSiteUrl newUrl addSiteState =
+    { addSiteState | url = newUrl }
+
+
+setAddSiteEmail : String -> AddSiteForm -> AddSiteForm
+setAddSiteEmail newEmail addSiteState =
+    { addSiteState | email = newEmail }
+
+
+setAddSiteStatus : Status -> AddSiteForm -> AddSiteForm
+setAddSiteStatus newStatus addSiteState =
+    { addSiteState | status = newStatus }
+
+
 type alias SiteCheck =
     { id : Int
     , response : Int
@@ -100,6 +139,9 @@ type Msg
     = FetchSites
     | SitesFetched (Result Http.Error (List Site))
     | FetchSite Site
+    | UpdateAddSiteForm AddSiteFormEditableKeys String
+    | SubmitNewSite
+    | SubmitSiteFetched (Result Http.Error Site)
     | SiteChecksFetched (Result Http.Error (List SiteCheck))
     | ShowSiteDetails Site
     | HoverSiteCheck (Maybe SiteCheck)
@@ -139,6 +181,7 @@ viewSitesList model =
             Loaded ->
                 [ h2 [] [ text "Monitored Sites" ]
                 , div [] (List.map viewSiteCard model.sites)
+                , viewAddSiteForm model.addSiteForm
                 ]
 
             Loading ->
@@ -146,6 +189,29 @@ viewSitesList model =
 
             Errored errMessage ->
                 [ text ("Error: " ++ errMessage) ]
+        )
+
+
+viewAddSiteForm : AddSiteForm -> Html Msg
+viewAddSiteForm addSiteForm =
+    let
+        errorMessage =
+            case addSiteForm.status of
+                Errored errMessage ->
+                    [ text ("There was an error submitting your site: " ++ errMessage), br [] [] ]
+
+                _ ->
+                    [ text "" ]
+    in
+    form [ onSubmit SubmitNewSite ]
+        (h4 [] [ text "Add Site" ]
+            :: errorMessage
+            ++ [ label [ for "url" ] [ strong [] [ text "Url" ] ]
+               , input [ type_ "text", disabled (addSiteForm.status == Loading), value addSiteForm.url, onInput (UpdateAddSiteForm Url) ] []
+               , label [ for "email" ] [ strong [] [ text "Email" ] ]
+               , input [ type_ "text", disabled (addSiteForm.status == Loading), value addSiteForm.email, onInput (UpdateAddSiteForm Email) ] []
+               , input [ type_ "submit", value "Submit" ] []
+               ]
         )
 
 
@@ -292,6 +358,21 @@ fetchSitesCmd =
         }
 
 
+submitNewSiteCmd : Model -> Cmd Msg
+submitNewSiteCmd model =
+    Http.post
+        { url = apiUrlPrefix ++ "/sites"
+        , body =
+            Http.jsonBody
+                (Encode.object
+                    [ ( "url", Encode.string model.addSiteForm.url )
+                    , ( "email", Encode.string model.addSiteForm.email )
+                    ]
+                )
+        , expect = Http.expectJson SubmitSiteFetched siteDecoder
+        }
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -324,8 +405,55 @@ update msg model =
                         Http.BadBody body ->
                             ( setStatus (Errored ("Bad Body: " ++ body)) model, Cmd.none )
 
+        SubmitSiteFetched result ->
+            case result of
+                Ok site ->
+                    ( model
+                        |> setAddSiteForm { url = "", email = "", status = Loaded }
+                        |> setSites (model.sites ++ [ site ])
+                    , Cmd.none
+                    )
+
+                Err httpError ->
+                    case httpError of
+                        Http.BadStatus status ->
+                            ( setStatus (Errored "Bad Status Code returned ") model, Cmd.none )
+
+                        Http.NetworkError ->
+                            ( setStatus (Errored "Network Error") model, Cmd.none )
+
+                        Http.Timeout ->
+                            ( setStatus (Errored "Timeout") model, Cmd.none )
+
+                        Http.BadUrl badUrl ->
+                            ( setStatus (Errored ("Bad Url: " ++ badUrl)) model, Cmd.none )
+
+                        Http.BadBody body ->
+                            ( setStatus (Errored ("Bad Body: " ++ body)) model, Cmd.none )
+
         ShowSiteDetails site ->
             ( setActiveSite site model, fetchSiteChecksCmd site )
+
+        UpdateAddSiteForm key value ->
+            ( case key of
+                Email ->
+                    model.addSiteForm
+                        |> setAddSiteEmail value
+                        |> asAddSiteFormIn model
+
+                Url ->
+                    model.addSiteForm
+                        |> setAddSiteUrl value
+                        |> asAddSiteFormIn model
+            , Cmd.none
+            )
+
+        SubmitNewSite ->
+            ( model.addSiteForm
+                |> setAddSiteStatus Loading
+                |> asAddSiteFormIn model
+            , submitNewSiteCmd model
+            )
 
         SiteChecksFetched result ->
             case result of
@@ -353,7 +481,16 @@ update msg model =
 
 initialModel : Model
 initialModel =
-    { sites = [], status = NotLoaded, activeSite = Nothing, hoveredSiteCheck = Nothing }
+    { sites = []
+    , status = NotLoaded
+    , activeSite = Nothing
+    , hoveredSiteCheck = Nothing
+    , addSiteForm =
+        { url = ""
+        , email = ""
+        , status = NotLoaded
+        }
+    }
 
 
 initialCmd =
