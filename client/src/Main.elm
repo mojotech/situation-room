@@ -1,12 +1,13 @@
 module Main exposing (main)
 
 import Browser
+import Debug
 import Element exposing (Element, column, el, padding, row)
 import Element.Font as Font
 import Flip exposing (flip)
 import Html exposing (..)
 import Html.Attributes exposing (class, disabled, for, type_, value)
-import Html.Events exposing (onClick, onInput, onSubmit)
+import Html.Events exposing (onClick, onInput, onSubmit, stopPropagationOn)
 import Http
 import Json.Decode exposing (Decoder, float, int, list, string, succeed)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
@@ -33,6 +34,12 @@ import LineChart.Line as LCLine
 import List
 import Time
 import Time.Format as TimeFormat
+
+
+onClickStopPropagation : msg -> Attribute msg
+onClickStopPropagation msg =
+    stopPropagationOn "click"
+        (Json.Decode.succeed ( msg, True ))
 
 
 apiUrlPrefix : String
@@ -77,6 +84,11 @@ setStatus newStatus model =
 setActiveSite : Site -> Model -> Model
 setActiveSite newActiveSite model =
     { model | activeSite = Just newActiveSite }
+
+
+unsetActiveSite : Model -> Model
+unsetActiveSite model =
+    { model | activeSite = Nothing }
 
 
 asActiveSiteIn : Model -> Site -> Model
@@ -226,7 +238,7 @@ viewAddSiteForm addSiteForm =
 viewSiteCard : Site -> Html Msg
 viewSiteCard site =
     div [ class "site-card", onClick (ShowSiteDetails site) ]
-        [ text site.url, button [ onClick (DeleteSite site) ] [ text "x" ] ]
+        [ text site.url, button [ onClickStopPropagation (DeleteSite site) ] [ text "x" ] ]
 
 
 viewSiteDetails : Model -> Html Msg
@@ -501,6 +513,18 @@ update msg model =
                         |> List.filter (\s -> s.id /= site.id)
                         |> asSitesIn model
                         |> setStatus Loaded
+                        |> (\m ->
+                                case m.activeSite of
+                                    Just activeSite ->
+                                        if site.id == activeSite.id then
+                                            unsetActiveSite m
+
+                                        else
+                                            m
+
+                                    Nothing ->
+                                        m
+                           )
                     , Cmd.none
                     )
 
