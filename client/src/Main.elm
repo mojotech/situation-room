@@ -373,6 +373,25 @@ submitNewSiteCmd model =
         }
 
 
+getGenericStatusFromHttpError : Http.Error -> Status
+getGenericStatusFromHttpError httpError =
+    case httpError of
+        Http.BadStatus status ->
+            Errored "Bad Status Code returned "
+
+        Http.NetworkError ->
+            Errored "Network Error"
+
+        Http.Timeout ->
+            Errored "Timeout"
+
+        Http.BadUrl badUrl ->
+            Errored ("Bad Url: " ++ badUrl)
+
+        Http.BadBody body ->
+            Errored ("Bad Body: " ++ body)
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -389,21 +408,7 @@ update msg model =
                     )
 
                 Err httpError ->
-                    case httpError of
-                        Http.BadStatus status ->
-                            ( setStatus (Errored "Bad Status Code returned ") model, Cmd.none )
-
-                        Http.NetworkError ->
-                            ( setStatus (Errored "Network Error") model, Cmd.none )
-
-                        Http.Timeout ->
-                            ( setStatus (Errored "Timeout") model, Cmd.none )
-
-                        Http.BadUrl badUrl ->
-                            ( setStatus (Errored ("Bad Url: " ++ badUrl)) model, Cmd.none )
-
-                        Http.BadBody body ->
-                            ( setStatus (Errored ("Bad Body: " ++ body)) model, Cmd.none )
+                    ( setStatus (getGenericStatusFromHttpError httpError) model, Cmd.none )
 
         SubmitSiteFetched result ->
             case result of
@@ -415,21 +420,11 @@ update msg model =
                     )
 
                 Err httpError ->
-                    case httpError of
-                        Http.BadStatus status ->
-                            ( setStatus (Errored "Bad Status Code returned ") model, Cmd.none )
-
-                        Http.NetworkError ->
-                            ( setStatus (Errored "Network Error") model, Cmd.none )
-
-                        Http.Timeout ->
-                            ( setStatus (Errored "Timeout") model, Cmd.none )
-
-                        Http.BadUrl badUrl ->
-                            ( setStatus (Errored ("Bad Url: " ++ badUrl)) model, Cmd.none )
-
-                        Http.BadBody body ->
-                            ( setStatus (Errored ("Bad Body: " ++ body)) model, Cmd.none )
+                    ( model.addSiteForm
+                        |> setAddSiteStatus (getGenericStatusFromHttpError httpError)
+                        |> asAddSiteFormIn model
+                    , Cmd.none
+                    )
 
         ShowSiteDetails site ->
             ( setActiveSite site model, fetchSiteChecksCmd site )
