@@ -30,6 +30,7 @@ import LineChart.Interpolation as LCInterpolation
 import LineChart.Junk as LCJunk
 import LineChart.Legends as LCLegends
 import LineChart.Line as LCLine
+import List
 import Time
 import Time.Format as TimeFormat
 
@@ -61,6 +62,11 @@ asAddSiteFormIn =
 setSites : List Site -> Model -> Model
 setSites newSites model =
     { model | sites = newSites }
+
+
+asSitesIn : Model -> List Site -> Model
+asSitesIn =
+    flip setSites
 
 
 setStatus : Status -> Model -> Model
@@ -139,6 +145,8 @@ type Msg
     = FetchSites
     | SitesFetched (Result Http.Error (List Site))
     | FetchSite Site
+    | DeleteSite Site
+    | DeleteSiteFetched Site (Result Http.Error ())
     | UpdateAddSiteForm AddSiteFormEditableKeys String
     | SubmitNewSite
     | SubmitSiteFetched (Result Http.Error Site)
@@ -218,7 +226,7 @@ viewAddSiteForm addSiteForm =
 viewSiteCard : Site -> Html Msg
 viewSiteCard site =
     div [ class "site-card", onClick (ShowSiteDetails site) ]
-        [ text site.url ]
+        [ text site.url, button [ onClick (DeleteSite site) ] [ text "x" ] ]
 
 
 viewSiteDetails : Model -> Html Msg
@@ -358,6 +366,19 @@ fetchSitesCmd =
         }
 
 
+deleteSiteCmd : Site -> Cmd Msg
+deleteSiteCmd site =
+    Http.request
+        { method = "DELETE"
+        , headers = []
+        , url = apiUrlPrefix ++ "/sites/" ++ site.id
+        , body = Http.emptyBody
+        , timeout = Nothing
+        , expect = Http.expectWhatever (DeleteSiteFetched site)
+        , tracker = Nothing
+        }
+
+
 submitNewSiteCmd : Model -> Cmd Msg
 submitNewSiteCmd model =
     Http.post
@@ -469,6 +490,22 @@ update msg model =
 
         HoverSiteCheck coordinatePoint ->
             ( setHoveredSiteCheck coordinatePoint model, Cmd.none )
+
+        DeleteSite site ->
+            ( setStatus Loading model, deleteSiteCmd site )
+
+        DeleteSiteFetched site result ->
+            case result of
+                Ok _ ->
+                    ( model.sites
+                        |> List.filter (\s -> s.id /= site.id)
+                        |> asSitesIn model
+                        |> setStatus Loaded
+                    , Cmd.none
+                    )
+
+                Err httpError ->
+                    ( setStatus (Errored "Failed to delete site...") model, Cmd.none )
 
         _ ->
             ( model, Cmd.none )
