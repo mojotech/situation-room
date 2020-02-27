@@ -3,6 +3,7 @@ module Main exposing (main)
 import Browser
 import Element exposing (Element, column, el, padding, row)
 import Element.Font as Font
+import Flip exposing (flip)
 import Html exposing (..)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
@@ -45,6 +46,31 @@ type alias Model =
     }
 
 
+setSites : List Site -> Model -> Model
+setSites newSites model =
+    { model | sites = newSites }
+
+
+setStatus : Status -> Model -> Model
+setStatus newStatus model =
+    { model | status = newStatus }
+
+
+setActiveSite : Site -> Model -> Model
+setActiveSite newActiveSite model =
+    { model | activeSite = Just newActiveSite }
+
+
+asActiveSiteIn : Model -> Site -> Model
+asActiveSiteIn =
+    flip setActiveSite
+
+
+setHoveredSiteCheck : Maybe SiteCheck -> Model -> Model
+setHoveredSiteCheck newHoveredSiteCheck model =
+    { model | hoveredSiteCheck = newHoveredSiteCheck }
+
+
 type alias Site =
     { id : String
     , url : String
@@ -53,6 +79,11 @@ type alias Site =
     , duration : Int
     , checks : List SiteCheck
     }
+
+
+setSiteChecks : List SiteCheck -> Site -> Site
+setSiteChecks newSiteChecks site =
+    { site | checks = newSiteChecks }
 
 
 type alias SiteCheck =
@@ -265,52 +296,56 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         FetchSites ->
-            ( { model | status = Loading }, fetchSitesCmd )
+            ( setStatus Loaded model, fetchSitesCmd )
 
         SitesFetched result ->
             case result of
                 Ok sites ->
-                    ( { model | sites = sites, status = Loaded }, Cmd.none )
+                    ( model
+                        |> setSites sites
+                        |> setStatus Loaded
+                    , Cmd.none
+                    )
 
                 Err httpError ->
                     case httpError of
                         Http.BadStatus status ->
-                            ( { model | status = Errored "Bad Status Code returned " }, Cmd.none )
+                            ( setStatus (Errored "Bad Status Code returned ") model, Cmd.none )
 
                         Http.NetworkError ->
-                            ( { model | status = Errored "Network Error" }, Cmd.none )
+                            ( setStatus (Errored "Network Error") model, Cmd.none )
 
                         Http.Timeout ->
-                            ( { model | status = Errored "Timeout" }, Cmd.none )
+                            ( setStatus (Errored "Timeout") model, Cmd.none )
 
                         Http.BadUrl badUrl ->
-                            ( { model | status = Errored ("Bad Url: " ++ badUrl) }, Cmd.none )
+                            ( setStatus (Errored ("Bad Url: " ++ badUrl)) model, Cmd.none )
 
                         Http.BadBody body ->
-                            ( { model | status = Errored ("Bad Body: " ++ body) }, Cmd.none )
+                            ( setStatus (Errored ("Bad Body: " ++ body)) model, Cmd.none )
 
         ShowSiteDetails site ->
-            ( { model | activeSite = Just site }, fetchSiteChecksCmd site )
+            ( setActiveSite site model, fetchSiteChecksCmd site )
 
         SiteChecksFetched result ->
             case result of
                 Ok siteChecks ->
                     case model.activeSite of
                         Just activeSite ->
-                            let
-                                updatedSite =
-                                    { activeSite | checks = siteChecks }
-                            in
-                            ( { model | activeSite = Just updatedSite }, Cmd.none )
+                            ( activeSite
+                                |> setSiteChecks siteChecks
+                                |> asActiveSiteIn model
+                            , Cmd.none
+                            )
 
                         Nothing ->
                             ( model, Cmd.none )
 
                 Err httpError ->
-                    ( { model | status = Errored "Failed to load site checks..." }, Cmd.none )
+                    ( setStatus (Errored "Failed to load site checks...") model, Cmd.none )
 
         HoverSiteCheck coordinatePoint ->
-            ( { model | hoveredSiteCheck = coordinatePoint }, Cmd.none )
+            ( setHoveredSiteCheck coordinatePoint model, Cmd.none )
 
         _ ->
             ( model, Cmd.none )
