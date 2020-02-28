@@ -36,69 +36,25 @@ import Time
 import Time.Format as TimeFormat
 
 
+
+-- HELPERS
+
+
 onClickStopPropagation : msg -> Attribute msg
 onClickStopPropagation msg =
     stopPropagationOn "click"
         (Json.Decode.succeed ( msg, True ))
 
 
-apiUrlPrefix : String
-apiUrlPrefix =
-    "http://localhost:4567"
+
+-- GENERIC TYPES
 
 
-type alias Model =
-    { sites : List Site
-    , status : Status
-    , activeSite : Maybe Site
-    , hoveredSiteCheck : Maybe SiteCheck
-    , addSiteForm : AddSiteForm
-    }
-
-
-setAddSiteForm : AddSiteForm -> Model -> Model
-setAddSiteForm newaddSiteForm model =
-    { model | addSiteForm = newaddSiteForm }
-
-
-asAddSiteFormIn : Model -> AddSiteForm -> Model
-asAddSiteFormIn =
-    flip setAddSiteForm
-
-
-setSites : List Site -> Model -> Model
-setSites newSites model =
-    { model | sites = newSites }
-
-
-asSitesIn : Model -> List Site -> Model
-asSitesIn =
-    flip setSites
-
-
-setStatus : Status -> Model -> Model
-setStatus newStatus model =
-    { model | status = newStatus }
-
-
-setActiveSite : Site -> Model -> Model
-setActiveSite newActiveSite model =
-    { model | activeSite = Just newActiveSite }
-
-
-unsetActiveSite : Model -> Model
-unsetActiveSite model =
-    { model | activeSite = Nothing }
-
-
-asActiveSiteIn : Model -> Site -> Model
-asActiveSiteIn =
-    flip setActiveSite
-
-
-setHoveredSiteCheck : Maybe SiteCheck -> Model -> Model
-setHoveredSiteCheck newHoveredSiteCheck model =
-    { model | hoveredSiteCheck = newHoveredSiteCheck }
+type Status
+    = NotLoaded
+    | Loading
+    | Loaded
+    | Errored String
 
 
 type alias Site =
@@ -111,38 +67,6 @@ type alias Site =
     }
 
 
-setSiteChecks : List SiteCheck -> Site -> Site
-setSiteChecks newSiteChecks site =
-    { site | checks = newSiteChecks }
-
-
-type alias AddSiteForm =
-    { url : String
-    , email : String
-    , status : Status
-    }
-
-
-type AddSiteFormEditableKeys
-    = Email
-    | Url
-
-
-setAddSiteUrl : String -> AddSiteForm -> AddSiteForm
-setAddSiteUrl newUrl addSiteState =
-    { addSiteState | url = newUrl }
-
-
-setAddSiteEmail : String -> AddSiteForm -> AddSiteForm
-setAddSiteEmail newEmail addSiteState =
-    { addSiteState | email = newEmail }
-
-
-setAddSiteStatus : Status -> AddSiteForm -> AddSiteForm
-setAddSiteStatus newStatus addSiteState =
-    { addSiteState | status = newStatus }
-
-
 type alias SiteCheck =
     { id : Int
     , response : Int
@@ -153,185 +77,32 @@ type alias SiteCheck =
     }
 
 
-type Msg
-    = FetchSites
-    | SitesFetched (Result Http.Error (List Site))
-    | FetchSite Site
-    | DeleteSite Site
-    | DeleteSiteFetched Site (Result Http.Error ())
-    | UpdateAddSiteForm AddSiteFormEditableKeys String
-    | SubmitNewSite
-    | SubmitSiteFetched (Result Http.Error Site)
-    | SiteChecksFetched (Result Http.Error (List SiteCheck))
-    | ShowSiteDetails Site
-    | HoverSiteCheck (Maybe SiteCheck)
-    | Noop
+
+--  API
 
 
-type Status
-    = NotLoaded
-    | Loading
-    | Loaded
-    | Errored String
+apiUrlPrefix : String
+apiUrlPrefix =
+    "http://localhost:4567"
 
 
-view : Model -> Html Msg
-view model =
-    Element.layout [ padding 20, Font.size 14 ]
-        (column
-            []
-            [ Element.html
-                (button [ onClick FetchSites ]
-                    [ text "Fetch Sites List" ]
-                )
-            , Element.html (viewSitesList model)
-            , Element.html (hr [] [])
-            , Element.html (viewSiteDetails model)
-            ]
-        )
+getGenericStatusFromHttpError : Http.Error -> Status
+getGenericStatusFromHttpError httpError =
+    case httpError of
+        Http.BadStatus status ->
+            Errored "Bad Status Code returned "
 
+        Http.NetworkError ->
+            Errored "Network Error"
 
-viewSitesList : Model -> Html Msg
-viewSitesList model =
-    section [ class "sites-list" ]
-        (case model.status of
-            NotLoaded ->
-                [ text "Please fetch sites list..." ]
+        Http.Timeout ->
+            Errored "Timeout"
 
-            Loaded ->
-                [ h2 [] [ text "Monitored Sites" ]
-                , div [] (List.map viewSiteCard model.sites)
-                , viewAddSiteForm model.addSiteForm
-                ]
+        Http.BadUrl badUrl ->
+            Errored ("Bad Url: " ++ badUrl)
 
-            Loading ->
-                [ text "...Fetching Sites.  Please Wait..." ]
-
-            Errored errMessage ->
-                [ text ("Error: " ++ errMessage) ]
-        )
-
-
-viewAddSiteForm : AddSiteForm -> Html Msg
-viewAddSiteForm addSiteForm =
-    let
-        errorMessage =
-            case addSiteForm.status of
-                Errored errMessage ->
-                    [ text ("There was an error submitting your site: " ++ errMessage), br [] [] ]
-
-                _ ->
-                    [ text "" ]
-    in
-    form [ onSubmit SubmitNewSite ]
-        (h4 [] [ text "Add Site" ]
-            :: errorMessage
-            ++ [ label [ for "url" ] [ strong [] [ text "Url" ] ]
-               , input [ type_ "text", disabled (addSiteForm.status == Loading), value addSiteForm.url, onInput (UpdateAddSiteForm Url) ] []
-               , label [ for "email" ] [ strong [] [ text "Email" ] ]
-               , input [ type_ "text", disabled (addSiteForm.status == Loading), value addSiteForm.email, onInput (UpdateAddSiteForm Email) ] []
-               , input [ type_ "submit", value "Submit" ] []
-               ]
-        )
-
-
-viewSiteCard : Site -> Html Msg
-viewSiteCard site =
-    div [ class "site-card", onClick (ShowSiteDetails site) ]
-        [ text site.url, button [ onClickStopPropagation (DeleteSite site) ] [ text "x" ] ]
-
-
-viewSiteDetails : Model -> Html Msg
-viewSiteDetails model =
-    case model.activeSite of
-        Just site ->
-            div [ class "site-details" ]
-                [ h2 [] [ text (site.url ++ " - " ++ site.status) ]
-                , viewSiteChecksChart model
-                ]
-
-        Nothing ->
-            div [ class "site-details empty" ] []
-
-
-viewSiteChecksChart : Model -> Html Msg
-viewSiteChecksChart model =
-    case model.activeSite of
-        Just site ->
-            LineChart.viewCustom (chartConfig model) [ LineChart.line LCColors.blue LCDots.circle "" site.checks ]
-
-        Nothing ->
-            div [ class "site-shart empty" ] []
-
-
-chartConfig : Model -> LineChart.Config SiteCheck Msg
-chartConfig model =
-    { y = LCAxis.full 450 "Response Time in ms" .responseTime
-    , x = LCAxis.time Time.utc 1270 "Time" (toFloat << Time.posixToMillis << .createdAt)
-    , container = LCContainer.default "uptime"
-    , interpolation = LCInterpolation.monotone
-    , intersection = LCIntersection.default
-    , legends = LCLegends.none
-    , events = LCEvents.hoverOne HoverSiteCheck
-    , junk = viewSiteCheckJunk model
-    , grid = LCGrid.lines 0.3 LCColors.gray
-    , area = LCArea.normal 1.0
-    , line = LCLine.default
-    , dots = LCDots.custom (LCDots.empty 5 1)
-    }
-
-
-viewSiteCheckJunk : Model -> LCJunk.Config SiteCheck msg
-viewSiteCheckJunk model =
-    case model.hoveredSiteCheck of
-        Nothing ->
-            LCJunk.default
-
-        Just _ ->
-            LCJunk.hoverOne model.hoveredSiteCheck
-                [ ( "Timestamp", formattedJunkTimestamp << .createdAt )
-                , ( "Response Time in ms", String.fromFloat << .responseTime )
-                , ( "Status Code", String.fromInt << .response )
-                ]
-
-
-formattedJunkTimestamp : Time.Posix -> String
-formattedJunkTimestamp timestamp =
-    timestamp
-        |> Time.posixToMillis
-        |> TimeFormat.format Time.utc "Weekday, Month Day, Year padHour:padMinute"
-
-
-customAxis : LCAxis.Config SiteCheck msg
-customAxis =
-    LCAxis.custom
-        { title = LCAxisTitle.default "Time"
-        , variable = Just << (toFloat << Time.posixToMillis << .createdAt)
-        , pixels = 1270
-        , range = LCAxisRange.padded 20 20
-        , axisLine = LCAxisLine.rangeFrame LCColors.gray
-        , ticks = LCAxisTicks.timeCustom Time.utc 8 customTimeTick
-        }
-
-
-customTimeTick : LCAxisTick.Time -> LCAxisTick.Config msg
-customTimeTick timestamp =
-    let
-        formattedTime =
-            TimeFormat.format Time.utc "padHour:padMinute:padSecond" (Time.posixToMillis timestamp.timestamp)
-
-        label =
-            LCJunk.label LCColors.black formattedTime
-    in
-    LCAxisTick.custom
-        { position = toFloat <| Time.posixToMillis timestamp.timestamp
-        , color = LCColors.gray
-        , width = 1
-        , length = 7
-        , grid = True
-        , direction = LCAxisTick.negative
-        , label = Just label
-        }
+        Http.BadBody body ->
+            Errored ("Bad Body: " ++ body)
 
 
 timestampDecoder : Decoder Time.Posix
@@ -406,23 +177,279 @@ submitNewSiteCmd model =
         }
 
 
-getGenericStatusFromHttpError : Http.Error -> Status
-getGenericStatusFromHttpError httpError =
-    case httpError of
-        Http.BadStatus status ->
-            Errored "Bad Status Code returned "
 
-        Http.NetworkError ->
-            Errored "Network Error"
+-- SITES
+-- SITES LIST
 
-        Http.Timeout ->
-            Errored "Timeout"
 
-        Http.BadUrl badUrl ->
-            Errored ("Bad Url: " ++ badUrl)
+setStatus : Status -> Model -> Model
+setStatus newStatus model =
+    { model | status = newStatus }
 
-        Http.BadBody body ->
-            Errored ("Bad Body: " ++ body)
+
+setSites : List Site -> Model -> Model
+setSites newSites model =
+    { model | sites = newSites }
+
+
+asSitesIn : Model -> List Site -> Model
+asSitesIn =
+    flip setSites
+
+
+viewSitesList : Model -> Html Msg
+viewSitesList model =
+    section [ class "sites-list" ]
+        (case model.status of
+            NotLoaded ->
+                [ text "Please fetch sites list..." ]
+
+            Loaded ->
+                [ h2 [] [ text "Monitored Sites" ]
+                , div [] (List.map viewSiteCard model.sites)
+                , viewAddSiteForm model.addSiteForm
+                ]
+
+            Loading ->
+                [ text "...Fetching Sites.  Please Wait..." ]
+
+            Errored errMessage ->
+                [ text ("Error: " ++ errMessage) ]
+        )
+
+
+viewSiteCard : Site -> Html Msg
+viewSiteCard site =
+    div [ class "site-card", onClick (ShowSiteDetails site) ]
+        [ text site.url, button [ onClickStopPropagation (DeleteSite site) ] [ text "x" ] ]
+
+
+
+-- SITES ADD
+
+
+type alias AddSiteForm =
+    { url : String
+    , email : String
+    , status : Status
+    }
+
+
+type AddSiteFormEditableKeys
+    = Email
+    | Url
+
+
+setAddSiteForm : AddSiteForm -> Model -> Model
+setAddSiteForm newaddSiteForm model =
+    { model | addSiteForm = newaddSiteForm }
+
+
+asAddSiteFormIn : Model -> AddSiteForm -> Model
+asAddSiteFormIn =
+    flip setAddSiteForm
+
+
+setAddSiteUrl : String -> AddSiteForm -> AddSiteForm
+setAddSiteUrl newUrl addSiteState =
+    { addSiteState | url = newUrl }
+
+
+setAddSiteEmail : String -> AddSiteForm -> AddSiteForm
+setAddSiteEmail newEmail addSiteState =
+    { addSiteState | email = newEmail }
+
+
+setAddSiteStatus : Status -> AddSiteForm -> AddSiteForm
+setAddSiteStatus newStatus addSiteState =
+    { addSiteState | status = newStatus }
+
+
+viewAddSiteForm : AddSiteForm -> Html Msg
+viewAddSiteForm addSiteForm =
+    let
+        errorMessage =
+            case addSiteForm.status of
+                Errored errMessage ->
+                    [ text ("There was an error submitting your site: " ++ errMessage), br [] [] ]
+
+                _ ->
+                    [ text "" ]
+    in
+    form [ onSubmit SubmitNewSite ]
+        (h4 [] [ text "Add Site" ]
+            :: errorMessage
+            ++ [ label [ for "url" ] [ strong [] [ text "Url" ] ]
+               , input [ type_ "text", disabled (addSiteForm.status == Loading), value addSiteForm.url, onInput (UpdateAddSiteForm Url) ] []
+               , label [ for "email" ] [ strong [] [ text "Email" ] ]
+               , input [ type_ "text", disabled (addSiteForm.status == Loading), value addSiteForm.email, onInput (UpdateAddSiteForm Email) ] []
+               , input [ type_ "submit", value "Submit" ] []
+               ]
+        )
+
+
+
+-- SITES VIEW SITE
+
+
+setActiveSite : Site -> Model -> Model
+setActiveSite newActiveSite model =
+    { model | activeSite = Just newActiveSite }
+
+
+unsetActiveSite : Model -> Model
+unsetActiveSite model =
+    { model | activeSite = Nothing }
+
+
+asActiveSiteIn : Model -> Site -> Model
+asActiveSiteIn =
+    flip setActiveSite
+
+
+setHoveredSiteCheck : Maybe SiteCheck -> Model -> Model
+setHoveredSiteCheck newHoveredSiteCheck model =
+    { model | hoveredSiteCheck = newHoveredSiteCheck }
+
+
+setSiteChecks : List SiteCheck -> Site -> Site
+setSiteChecks newSiteChecks site =
+    { site | checks = newSiteChecks }
+
+
+chartConfig : Model -> LineChart.Config SiteCheck Msg
+chartConfig model =
+    { y = LCAxis.full 450 "Response Time in ms" .responseTime
+    , x = LCAxis.time Time.utc 1270 "Time" (toFloat << Time.posixToMillis << .createdAt)
+    , container = LCContainer.default "uptime"
+    , interpolation = LCInterpolation.monotone
+    , intersection = LCIntersection.default
+    , legends = LCLegends.none
+    , events = LCEvents.hoverOne HoverSiteCheck
+    , junk = viewSiteCheckJunk model
+    , grid = LCGrid.lines 0.3 LCColors.gray
+    , area = LCArea.normal 1.0
+    , line = LCLine.default
+    , dots = LCDots.custom (LCDots.empty 5 1)
+    }
+
+
+formattedJunkTimestamp : Time.Posix -> String
+formattedJunkTimestamp timestamp =
+    timestamp
+        |> Time.posixToMillis
+        |> TimeFormat.format Time.utc "Weekday, Month Day, Year padHour:padMinute"
+
+
+customAxis : LCAxis.Config SiteCheck msg
+customAxis =
+    LCAxis.custom
+        { title = LCAxisTitle.default "Time"
+        , variable = Just << (toFloat << Time.posixToMillis << .createdAt)
+        , pixels = 1270
+        , range = LCAxisRange.padded 20 20
+        , axisLine = LCAxisLine.rangeFrame LCColors.gray
+        , ticks = LCAxisTicks.timeCustom Time.utc 8 customTimeTick
+        }
+
+
+customTimeTick : LCAxisTick.Time -> LCAxisTick.Config msg
+customTimeTick timestamp =
+    let
+        formattedTime =
+            TimeFormat.format Time.utc "padHour:padMinute:padSecond" (Time.posixToMillis timestamp.timestamp)
+
+        label =
+            LCJunk.label LCColors.black formattedTime
+    in
+    LCAxisTick.custom
+        { position = toFloat <| Time.posixToMillis timestamp.timestamp
+        , color = LCColors.gray
+        , width = 1
+        , length = 7
+        , grid = True
+        , direction = LCAxisTick.negative
+        , label = Just label
+        }
+
+
+viewSiteDetails : Model -> Html Msg
+viewSiteDetails model =
+    case model.activeSite of
+        Just site ->
+            div [ class "site-details" ]
+                [ h2 [] [ text (site.url ++ " - " ++ site.status) ]
+                , viewSiteChecksChart model
+                ]
+
+        Nothing ->
+            div [ class "site-details empty" ] []
+
+
+viewSiteChecksChart : Model -> Html Msg
+viewSiteChecksChart model =
+    case model.activeSite of
+        Just site ->
+            LineChart.viewCustom (chartConfig model) [ LineChart.line LCColors.blue LCDots.circle "" site.checks ]
+
+        Nothing ->
+            div [ class "site-shart empty" ] []
+
+
+viewSiteCheckJunk : Model -> LCJunk.Config SiteCheck msg
+viewSiteCheckJunk model =
+    case model.hoveredSiteCheck of
+        Nothing ->
+            LCJunk.default
+
+        Just _ ->
+            LCJunk.hoverOne model.hoveredSiteCheck
+                [ ( "Timestamp", formattedJunkTimestamp << .createdAt )
+                , ( "Response Time in ms", String.fromFloat << .responseTime )
+                , ( "Status Code", String.fromInt << .response )
+                ]
+
+
+
+-- MAIN
+
+
+type alias Model =
+    { sites : List Site
+    , status : Status
+    , activeSite : Maybe Site
+    , hoveredSiteCheck : Maybe SiteCheck
+    , addSiteForm : AddSiteForm
+    }
+
+
+initialModel : Model
+initialModel =
+    { sites = []
+    , status = NotLoaded
+    , activeSite = Nothing
+    , hoveredSiteCheck = Nothing
+    , addSiteForm =
+        { url = ""
+        , email = ""
+        , status = NotLoaded
+        }
+    }
+
+
+type Msg
+    = FetchSites
+    | SitesFetched (Result Http.Error (List Site))
+    | FetchSite Site
+    | DeleteSite Site
+    | DeleteSiteFetched Site (Result Http.Error ())
+    | UpdateAddSiteForm AddSiteFormEditableKeys String
+    | SubmitNewSite
+    | SubmitSiteFetched (Result Http.Error Site)
+    | SiteChecksFetched (Result Http.Error (List SiteCheck))
+    | ShowSiteDetails Site
+    | HoverSiteCheck (Maybe SiteCheck)
+    | Noop
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -535,18 +562,20 @@ update msg model =
             ( model, Cmd.none )
 
 
-initialModel : Model
-initialModel =
-    { sites = []
-    , status = NotLoaded
-    , activeSite = Nothing
-    , hoveredSiteCheck = Nothing
-    , addSiteForm =
-        { url = ""
-        , email = ""
-        , status = NotLoaded
-        }
-    }
+view : Model -> Html Msg
+view model =
+    Element.layout [ padding 20, Font.size 14 ]
+        (column
+            []
+            [ Element.html
+                (button [ onClick FetchSites ]
+                    [ text "Fetch Sites List" ]
+                )
+            , Element.html (viewSitesList model)
+            , Element.html (hr [] [])
+            , Element.html (viewSiteDetails model)
+            ]
+        )
 
 
 initialCmd =
