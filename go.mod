@@ -1,3 +1,5 @@
+// +heroku goVersion go1.13
+
 module github.com/mojotech/situation-room
 
 go 1.13
