@@ -41,7 +41,7 @@ use the following.
 
 ```bash
 $ go get github.com/codegangsta/gin
-$ make gin
+$ PORT=8888 make gin
 ```
 
 This will start the server on port 8989 and auto-restart the app when any Go

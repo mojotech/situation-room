@@ -4,7 +4,7 @@ build: *.go
 	go build -o build/situation-room
 
 gin:
-	@gin -i -a 4567 -p 8989
+	@gin -i -a ${PORT} -p 8989
 
 deps:
 	@cd client && npm i
