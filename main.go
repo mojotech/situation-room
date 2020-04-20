@@ -7,8 +7,8 @@ import (
 	"os"
 
 	_ "github.com/joho/godotenv/autoload"
-	"github.com/labstack/echo"
-	mw "github.com/labstack/echo/middleware"
+	"github.com/labstack/echo/v4"
+	mw "github.com/labstack/echo/v4/middleware"
 	_ "github.com/mattn/go-sqlite3"
 	"gopkg.in/gorp.v1"
 )
