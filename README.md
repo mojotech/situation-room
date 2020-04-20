@@ -8,7 +8,7 @@ checks like load times, page load sizes, etc... will be added.
 
 ## Requirements
 
-* [go][4] - 1.11 or newer
+* [go][4] - 1.13 or newer
 
 ### Optional
 
@@ -23,11 +23,18 @@ checks like load times, page load sizes, etc... will be added.
 Copy the `.env.sample` file to `.env` and set the sample enviroment variables to
 your preferred settings.
 
-Next install all the app dependencies:
+Situation Room now uses [go modules](https://github.com/golang/go/wiki/Modules) for
+dependency management via the `go.mod` and `go.sum` files.
+
+First install all the app dependencies:
 
 ```bash
 $ go get ./...
 ```
+
+In the future, when adding new dependencies, you can just add your `require`
+statements to any `*.go` source file, and go modules will install the required
+dependency the next time a build command is run.
 
 If you want to use [gin][2] for app live-reloading while you develop, you can
 use the following.
