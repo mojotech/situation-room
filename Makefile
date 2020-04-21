@@ -1,5 +1,7 @@
 .PHONY: gin deps test
 
+PORT=4567
+
 build: *.go
 	go build -o build/situation-room
 
