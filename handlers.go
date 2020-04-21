@@ -55,6 +55,8 @@ func createSiteHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Problem saving your new site")
 	}
 
+	DispatchNewSite(site)
+
 	return c.JSON(http.StatusCreated, site)
 }
 
@@ -97,15 +99,16 @@ func deleteSiteHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Error deleting site")
 	}
 
+	RemoveSiteChecker(siteKey)
 	return c.NoContent(http.StatusNoContent)
 }
 
-func removeSite(Id string) error {
-	_, err := db.Exec("DELETE FROM sites WHERE id=$1", Id)
+func removeSite(siteID string) error {
+	_, err := db.Exec("DELETE FROM sites WHERE id=$1", siteID)
 	if err != nil {
 		return err
 	}
 
-	_, err = db.Exec("DELETE FROM checks WHERE siteId=$1", Id)
+	_, err = db.Exec("DELETE FROM checks WHERE siteId=$1", siteID)
 	return err
 }
