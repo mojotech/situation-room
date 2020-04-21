@@ -41,7 +41,6 @@ func main() {
 		log.Fatalf("Failed to start dispatcher: %s", err)
 	}
 
-	// e.Run(":" + serverPort)
 	e.Logger.Fatal(e.Start(":" + serverPort))
 }
 
