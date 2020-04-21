@@ -36,7 +36,10 @@ func main() {
 	e.GET("/sites/:key/checks", checksHandler)
 	e.DELETE("/sites/:key", deleteSiteHandler)
 
-	StartDispatcher()
+	err := StartDispatcher()
+	if err != nil {
+		log.Fatalf("Failed to start dispatcher: %s", err)
+	}
 
 	// e.Run(":" + serverPort)
 	e.Logger.Fatal(e.Start(":" + serverPort))

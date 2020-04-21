@@ -13,8 +13,8 @@ const ErrorStatus = "ERROR"
 // ConfigErrorStatus represents a site that is unreachable due to back data
 const ConfigErrorStatus = "CONFIG ERROR"
 
-// Hit the site URL with a HEAD request and update appropriate fields
-func checkSiteStatus(s Site) {
+// CheckSiteStatus will hit the site URL with a HEAD request and update appropriate fields
+func CheckSiteStatus(s Site) {
 	// If this is an invalid Site config, don't even bother checking
 	if ConfigErrorStatus == s.Status {
 		return
