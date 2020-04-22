@@ -51,7 +51,7 @@ func createSiteHandler(c echo.Context) error {
 
 	err = db.Insert(&site)
 	if err != nil {
-		log.Fatalf("Problem saving new site: %s", err)
+		log.Printf("[ERROR] Problem saving new site: %s", err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "Problem saving your new site")
 	}
 

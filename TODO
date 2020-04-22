@@ -1,3 +1,4 @@
+* Dont log DEBUG statements unless debug is on
 * Update CORS config to not always be global wildcard allow
 * Fix Makefile gin command to handle unset PORT env var
 * Replace/update Gorp to latest
