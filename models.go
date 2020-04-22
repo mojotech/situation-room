@@ -25,11 +25,11 @@ func (s *Site) HashId() string {
 }
 
 type Check struct {
-	Id           int64     `json:"id"`
-	URL          string    `json:"url"`
+	Id           int64     `json:"-"`
+	URL          string    `json:"-"`
 	Response     int       `json:"response"`
 	ResponseTime int64     `json:"responseTime"`
-	SiteId       string    `json:"siteId"`
+	SiteId       string    `json:"-"`
 	CreatedAt    time.Time `json:"createdAt"`
 }
 
