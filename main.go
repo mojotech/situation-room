@@ -8,6 +8,7 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/labstack/echo/v4"
 	mw "github.com/labstack/echo/v4/middleware"
+	echoLog "github.com/labstack/gommon/log"
 	_ "github.com/mattn/go-sqlite3"
 	"gopkg.in/gorp.v1"
 )
@@ -39,6 +40,10 @@ func main() {
 	e.GET("/sites/:key", siteHandler)
 	e.GET("/sites/:key/checks", checksHandler)
 	e.DELETE("/sites/:key", deleteSiteHandler)
+
+	if debugLog {
+		e.Logger.SetLevel(echoLog.DEBUG)
+	}
 
 	err := StartDispatcher()
 	if err != nil {

@@ -52,7 +52,9 @@ func CheckSiteStatus(s Site) {
 		_, _ = db.Update(&s)
 	}
 
-	log.Println("[DEBUG]", s.URL, s.Status)
+	if debugLog {
+		log.Println("[DEBUG]", s.URL, s.Status)
+	}
 }
 
 func (s Site) logStat(status int, responseTime time.Duration) error {
