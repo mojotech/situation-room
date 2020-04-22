@@ -42,7 +42,9 @@ func DispatchNewSite(s Site) error {
 	sc := SiteCheck{s.Id, c, t}
 	siteCheckers[s.Id] = sc
 
-	log.Println("[DEBUG] Launching site checker for:", s.URL)
+	if debugLog {
+		log.Println("[DEBUG] Launching site checker for:", s.URL)
+	}
 	go func() {
 		for {
 			select {
