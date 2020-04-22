@@ -14,15 +14,22 @@ import (
 )
 
 var (
-	serverPort = os.Getenv("PORT")
-
-	db *gorp.DbMap
+	db         *gorp.DbMap
+	debugLog   bool
+	serverPort = "4567"
 )
 
 func main() {
 	flag.Parse()
 
 	db = setupDb()
+
+	// Set up ENV flags and overrides
+	_, debugLog = os.LookupEnv("DEBUG")
+	port, portOverride := os.LookupEnv("PORT")
+	if portOverride {
+		serverPort = port
+	}
 
 	e := echo.New()
 	e.Use(mw.Logger())
