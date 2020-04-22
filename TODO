@@ -1,4 +1,3 @@
-* Update CORS config to not always be global wildcard allow
 * Replace/update Gorp to latest
 * Don't use sqlite DB in production?
 * Clean/truncate/remote old records from DB checks table
