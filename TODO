@@ -1,7 +1,7 @@
 * Dont log DEBUG statements unless debug is on
 * Update CORS config to not always be global wildcard allow
-* Fix Makefile gin command to handle unset PORT env var
 * Replace/update Gorp to latest
 * Don't use sqlite DB in production?
 * Clean/truncate/remote old records from DB checks table
 * Add a simple "metrics" page for viewing current status and list of sites being checked
+* Actually send alerts and detect up/downtime changes
