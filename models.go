@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// Site represents a website to check the uptime status of
 type Site struct {
 	Id        string    `json:"id"`
 	URL       string    `json:"url"`
@@ -17,6 +18,7 @@ type Site struct {
 	UpdatedAt time.Time `json:"-"`
 }
 
+// HashId converts the URL of a Site into a unique identifier
 func (s *Site) HashId() string {
 	if 0 == len(s.Id) {
 		s.Id = fmt.Sprintf("%x", md5.Sum([]byte(s.URL)))
@@ -24,6 +26,7 @@ func (s *Site) HashId() string {
 	return s.Id
 }
 
+// Check represents an individual uptime check of a Site
 type Check struct {
 	Id           int64     `json:"-"`
 	URL          string    `json:"-"`
@@ -33,7 +36,7 @@ type Check struct {
 	CreatedAt    time.Time `json:"createdAt"`
 }
 
-// Customize the JSON marshaling of our time.Time fields
+// MarshalJSON customizes the JSON marshaling of our time.Time fields
 func (c *Check) MarshalJSON() ([]byte, error) {
 	type Alias Check
 	return json.Marshal(&struct {
