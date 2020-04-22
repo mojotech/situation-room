@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"flag"
 	"log"
 	"os"
 
@@ -20,8 +19,6 @@ var (
 )
 
 func main() {
-	flag.Parse()
-
 	db = setupDb()
 
 	// Set up ENV flags and overrides
