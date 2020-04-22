@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -52,7 +53,7 @@ func createSiteHandler(c echo.Context) error {
 	err = db.Insert(&site)
 	if err != nil {
 		log.Printf("[ERROR] Problem saving new site: %s", err)
-		return echo.NewHTTPError(http.StatusInternalServerError, "Problem saving your new site")
+		return echo.NewHTTPError(http.StatusConflict, fmt.Sprintf("Problem saving your new site: %s", err))
 	}
 
 	DispatchNewSite(site)
