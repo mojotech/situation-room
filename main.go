@@ -17,6 +17,7 @@ var (
 	db         *gorp.DbMap
 	debugLog   bool
 	serverPort = "4567"
+	corsOrigin = "*"
 )
 
 func main() {
@@ -29,10 +30,15 @@ func main() {
 		serverPort = port
 	}
 
+	customCorsOrigin, corsOverride := os.LookupEnv("CORS_ORIGIN")
+	if corsOverride {
+		corsOrigin = customCorsOrigin
+	}
+
 	e := echo.New()
 	e.Use(mw.Logger())
 	e.Use(mw.CORSWithConfig(mw.CORSConfig{
-		AllowOrigins: []string{"*"},
+		AllowOrigins: []string{corsOrigin},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
 	}))
 	e.GET("/sites", sitesHandler)
