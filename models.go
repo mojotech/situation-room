@@ -40,7 +40,7 @@ func (c *Check) MarshalJSON() ([]byte, error) {
 		CreatedAt int64 `json:"createdAt"`
 		*Alias
 	}{
-		CreatedAt: c.CreatedAt.Unix(),
+		CreatedAt: c.CreatedAt.Unix() * 1000,
 		Alias:     (*Alias)(c),
 	})
 }
