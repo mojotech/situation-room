@@ -1,0 +1,1 @@
+docker run -dit --name situation_dev -p 5432:5432 -e POSTGRES_PASSWORD=situation -e POSTGRES_USER=root postgres
