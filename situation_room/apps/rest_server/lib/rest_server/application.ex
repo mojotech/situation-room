@@ -10,6 +10,7 @@ defmodule RESTserver.Application do
     children = [
       # Starts a worker by calling: RESTserver.Worker.start_link(arg)
       # {RESTserver.Worker, arg}
+      RESTserver.Repo,
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

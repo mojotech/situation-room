@@ -16,3 +16,12 @@ import Config
 #       format: "$date $time [$level] $metadata$message\n",
 #       metadata: [:user_id]
 #
+
+config :rest_server, RESTserver.Repo,
+  database: "situation_room",
+  username: "root",
+  password: "situation",
+  hostname: "localhost"
+
+
+config :rest_server, ecto_repos: [RESTserver.Repo]
