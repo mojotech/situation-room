@@ -4,7 +4,7 @@ defmodule RESTserver.PingHistory do
   schema "ping_history" do
     #field :id, :integer
     field :sid, :integer
-    field :timestamp, :integer
+    field :timestamp, :naive_datetime_usec
     field :result, :boolean
     field :latency, :integer
   end
