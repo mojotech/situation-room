@@ -1,3 +1,5 @@
+#import RESTserver.PingHistory
+#import RESTserver.Active
 defmodule RESTserver.Site do
   use Ecto.Schema
 
@@ -6,7 +8,7 @@ defmodule RESTserver.Site do
     field :endpoint, :string
     field :name, :string
     field :created_at, :naive_datetime_usec
-    has_many :ping_history, PingHistory
-    has_one :active, Active
+    #has_many :ping_history, PingHistory
+    #has_one :active, Active
   end
 end
