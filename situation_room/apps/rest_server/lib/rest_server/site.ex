@@ -18,6 +18,7 @@ defmodule RESTserver.Site do
     struct
     |> cast(params, [:endpoint, :name])
     |> validate_required([:endpoint, :name])
+    #|> RESTServer.insert()
   end
 
 end
