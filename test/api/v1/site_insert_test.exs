@@ -1,6 +1,10 @@
-defmodule SituationRoom.ValidatorTest do
-  use ExUnit.Case, async: true
+defmodule SituationRoom.InsertTest do
+  use ExUnit.Case
   import SituationRoom.Site
+
+  setup do
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(SituationRoom.Repo)
+  end
 
   @test_suites [
     {"MojoTech Main", "https://mojotech.com", true},
@@ -18,14 +22,14 @@ defmodule SituationRoom.ValidatorTest do
 
     test "Return valid validation for #{elem(i, 1)}" do
       test_case = unquote(mac)
+      expected_result = elem(test_case, 2)
+      res = create_site(elem(test_case, 0), elem(test_case, 1))
 
-      result =
-        changeset(%SituationRoom.Site{}, %{
-          "name" => elem(test_case, 0),
-          "endpoint" => elem(test_case, 1)
-        })
-
-      assert result.valid? == elem(test_case, 2)
+      if expected_result do
+        assert {:ok, _} = res
+      else
+        assert {:error, _} = res
+      end
     end
   end
 end
