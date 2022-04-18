@@ -1,18 +1,15 @@
 defmodule SituationRoom do
-  @moduledoc """
-  Documentation for `SituationRoom`.
-  """
+  use Application
 
-  @doc """
-  Hello world.
+  @spec start(atom, list) :: {:error, any} | {:ok, pid}
+  def start(_type, _args) do
+    # List all child processes to be supervised
+    children = [
+      SituationRoom.Repo
+    ]
 
-  ## Examples
+    opts = [strategy: :one_for_one, name: SituationRoom.Supervisor]
 
-      iex> SituationRoom.hello()
-      :world
-
-  """
-  def hello do
-    :world
+    Supervisor.start_link(children, opts)
   end
 end
