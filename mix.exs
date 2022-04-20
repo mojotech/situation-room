@@ -5,7 +5,7 @@ defmodule SituationRoom.MixProject do
     [
       app: :situation_room,
       version: "0.1.0",
-      elixir: "~> 1.13",
+      elixir: "~> 1.13.4",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       aliases: aliases()
