@@ -4,7 +4,7 @@ NOTES.md
 
 # Env Variables migrated from old .gitignore
 .env
-/config/
+.envrc
 
 # Formatter config
 .formatter.exs

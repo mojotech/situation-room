@@ -34,11 +34,6 @@ defmodule SituationRoom.MixProject do
 
   defp aliases do
     # Alises that auto setup the database when conducting tests
-    [
-      test: [
-        "ecto.create --quiet",
-        "ecto.migrate", "test"
-      ]
-    ]
+    [test: ["ecto.create --quiet", "ecto.migrate", "test"]]
   end
 end
