@@ -11,7 +11,17 @@ defmodule SituationRoom.Site do
   # Delete a site from the database by specifying specific field
   # param ex: (name: "mojotech") or (endpoint: "http://mojo.com")
   def delete_site(param) do
-    param |> get_site |> delete
+    case res = get_site(param) do
+      %SituationRoom.Site{} ->
+        delete(res)
+
+      _ ->
+        {:error, "Site does not exist"}
+    end
+
+    # Rescues when there is an unexpected error.. eg. duplicate entries found in db
+  rescue
+    _ -> {:error, "Cannot delete site"}
   end
 
   # Get a site from the database by one specific field
@@ -30,6 +40,7 @@ defmodule SituationRoom.Site do
   @spec create_site(String.t(), String.t()) :: {:ok, Site.t()} | {:error, Site.t()}
   def create_site(name, endpoint) do
     changeset = changeset(%SituationRoom.Site{}, %{"name" => name, "endpoint" => endpoint})
+
     if changeset.valid? do
       insert(changeset, on_conflict: :nothing)
     else
