@@ -39,14 +39,11 @@ defmodule SituationRoom.ValidatorTest do
 
       if expected_result do
         assert {:ok, _} = create_res
-        query_res = get_site(name: elem(test_case, 0))
-        # Add assert statement to test query
-        # assert query_res[:endpoint] = elem(test_case, 1)
+
         assert {:ok, _} = delete_site(endpoint: elem(test_case, 1))
       else
         assert {:error, _} = create_res
       end
     end
-
   end
 end
