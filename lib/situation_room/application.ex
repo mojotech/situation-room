@@ -8,7 +8,7 @@ defmodule SituationRoom.Application do
     # List all child processes to be supervised
     children = [
       SituationRoom.Repo,
-      {Plug.Cowboy, scheme: :http, plug: SituationRoom.Router, options: [port: port]}
+      {Plug.Cowboy, scheme: :http, plug: SituationRoom.Router, options: [port: 4001]}
     ]
 
     opts = [strategy: :one_for_one, name: SituationRoom.Supervisor]
