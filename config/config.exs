@@ -11,7 +11,8 @@ config :situation_room, SituationRoom.Repo,
 
 config :situation_room,
   ecto_repos: [SituationRoom.Repo],
-  env: Mix.env(),
-  port: System.get_env("PLUG_PORT")
+  env: Mix.env()
+
+config :situation_room, SituationRoom.Application, port: System.get_env("PLUG_PORT")
 
 import_config "#{Mix.env()}.exs"
