@@ -14,5 +14,4 @@ config :situation_room,
   env: Mix.env()
 
 config :situation_room, SituationRoom.Application, port: System.get_env("PORT")
-
 import_config "#{Mix.env()}.exs"
