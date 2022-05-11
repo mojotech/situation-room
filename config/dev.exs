@@ -7,4 +7,5 @@ config :situation_room, SituationRoom.Repo,
   hostname: System.get_env("POSTGRES_HOSTNAME"),
   pool: Ecto.Adapters.SQL.Sandbox
 
-config :situation_room, ecto_repos: [SituationRoom.Repo]
+config :situation_room,
+  ecto_repos: [SituationRoom.Repo]
