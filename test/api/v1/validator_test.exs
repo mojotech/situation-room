@@ -1,9 +1,10 @@
 defmodule SituationRoom.ValidatorTest do
   use ExUnit.Case, async: true
-  import SituationRoom.Site
+  alias Ecto.Adapters.SQL.Sandbox
+  alias SituationRoom.{Repo, Site}
 
   setup do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(SituationRoom.Repo)
+    :ok = Sandbox.checkout(Repo)
   end
 
   @test_suites [
@@ -24,7 +25,7 @@ defmodule SituationRoom.ValidatorTest do
       test_case = unquote(mac)
 
       result =
-        changeset(%SituationRoom.Site{}, %{
+        Site.changeset(%Site{}, %{
           "name" => elem(test_case, 0),
           "endpoint" => elem(test_case, 1)
         })
@@ -35,12 +36,12 @@ defmodule SituationRoom.ValidatorTest do
     test "Test site creation, query, and deletion #{elem(i, 1)}" do
       test_case = unquote(mac)
       expected_result = elem(test_case, 2)
-      create_res = create_site(elem(test_case, 0), elem(test_case, 1))
+      create_res = Site.create_site(elem(test_case, 0), elem(test_case, 1))
 
       if expected_result do
         assert {:ok, _} = create_res
 
-        assert {:ok, _} = delete_site(endpoint: elem(test_case, 1))
+        assert {:ok, _} = Site.delete_site(endpoint: elem(test_case, 1))
       else
         assert {:error, _} = create_res
       end

@@ -1,4 +1,7 @@
 defmodule SituationRoom.Site.Controller do
+  @moduledoc """
+  Documentation for `SituationRoom.Site.Controller`.
+  """
   alias SituationRoom.Site
   use Plug.Router
 
@@ -50,7 +53,6 @@ defmodule SituationRoom.Site.Controller do
         send_resp(conn, 201, "{:ok, '#{conn.params["endpoint"]} has been deleted'}")
 
       _ ->
-        IO.inspect("Pattern matched catch all")
         send_resp(conn, 400, "{:error, 'Unable to delete #{conn.params["endpoint"]}'}")
     end
   end

@@ -1,4 +1,7 @@
 defmodule SituationRoom.Application do
+  @moduledoc """
+  Documentation for `SituationRoom.Application`.
+  """
   use Application
 
   @impl true

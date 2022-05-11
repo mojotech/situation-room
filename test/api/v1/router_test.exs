@@ -1,12 +1,13 @@
 defmodule SituationRoom.RouterTest do
   use ExUnit.Case, async: true
   use Plug.Test
+  alias Ecto.Adapters.SQL.Sandbox
   alias SituationRoom.Router
 
   @opts Router.init([])
 
   setup do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(SituationRoom.Repo)
+    :ok = Sandbox.checkout(SituationRoom.Repo)
   end
 
   test "return /ping route" do

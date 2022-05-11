@@ -1,8 +1,8 @@
 defmodule SituationRoom.Site.ControllerTest do
   use ExUnit.Case, async: false
   use Plug.Test
-  alias SituationRoom.Router
-  alias SituationRoom.Site
+  alias Ecto.Adapters.SQL.Sandbox
+  alias SituationRoom.{Router, Site}
 
   @opts Router.init([])
   @test_site {"testName", "https://test.com", "https:%2F%2Ftest.com", "https://test.asdfg",
@@ -14,7 +14,7 @@ defmodule SituationRoom.Site.ControllerTest do
   @test_url_invalid_http elem(@test_site, 4)
 
   setup do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(SituationRoom.Repo)
+    :ok = Sandbox.checkout(SituationRoom.Repo)
     seed()
   end
 
@@ -101,7 +101,7 @@ defmodule SituationRoom.Site.ControllerTest do
     end
   end
 
-  defp seed() do
+  defp seed do
     case res = Site.get_site(name: @test_name) do
       nil = res ->
         Site.create_site(@test_name, @test_url)

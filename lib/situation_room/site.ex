@@ -1,4 +1,7 @@
 defmodule SituationRoom.Site do
+  @moduledoc """
+  Documentation for `SituationRoom.Site`.
+  """
   use Ecto.Schema
   import Ecto.Changeset
   import SituationRoom.Repo
@@ -31,7 +34,7 @@ defmodule SituationRoom.Site do
   end
 
   # Returns all sites in the database
-  def get_all_sites() do
+  def get_all_sites do
     SituationRoom.Site |> all
   end
 
@@ -68,15 +71,19 @@ defmodule SituationRoom.Site do
           "is missing a host"
 
         %URI{host: host} ->
-          case :inet.gethostbyname(Kernel.to_charlist(host)) do
-            {:ok, _} -> nil
-            {:error, _} -> "invalid host"
-          end
+          determine_valid_url(host)
       end
       |> case do
         error when is_binary(error) -> [{field, Keyword.get(opts, :message, error)}]
         _ -> []
       end
     end)
+  end
+
+  defp determine_valid_url(host) do
+    case :inet.gethostbyname(Kernel.to_charlist(host)) do
+      {:ok, _} -> nil
+      {:error, _} -> "invalid host"
+    end
   end
 end
