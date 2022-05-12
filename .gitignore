@@ -6,9 +6,6 @@ NOTES.md
 .env
 .envrc
 
-# Formatter config
-.formatter.exs
-
 # The directory Mix will write compiled artifacts to.
 /_build/
 
