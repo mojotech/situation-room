@@ -1,4 +1,7 @@
 defmodule SituationRoom.Site.Controller do
+  @moduledoc """
+  Documentation for `SituationRoom.Site.Controller`.
+  """
   alias SituationRoom.Site
   use Plug.Router
 
