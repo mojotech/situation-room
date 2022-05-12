@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+
+set -e
+
+mix --version
+mix local.rebar --force
+mix local.hex --force
+yes | mix deps.get
+
+# Ensure migrations directory exists for first build
+mkdir -p "${HOME}/${CIRCLE_PROJECT_REPONAME}/priv/repo/migrations"
+
+exit 0

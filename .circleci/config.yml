@@ -1,0 +1,48 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: cimg/elixir:1.13.4
+        environment:
+          MIX_ENV: "test"
+          CIRCLE_PROJECT_REPONAME: "situation_room"
+    working_directory: ~/situation_room
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "cd:34:33:6d:69:e6:15:6f:c1:eb:d1:96:ab:de:b2:0e"
+      - checkout
+      - restore_cache:  # restores saved mix cache
+          keys:  # list of cache keys, in decreasing specificity
+            - v2-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
+            - v2-mix-cache-{{ .Branch }}
+            - v2-mix-cache
+      - run:
+          name: Setup
+          command: |-
+            sudo apt-get update
+            sudo apt-get install libnss3 libgconf-2-4
+            ./bin/circle_build
+            mix deps.compile
+            mix compile
+            mix dialyzer --plt --halt-exit-status
+          no_output_timeout: 20m
+      - save_cache:
+          key: v2-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
+          paths:
+            - _build
+            - deps
+      - run:
+          name: Run tests
+          command: |-
+            echo "Running tests"
+            mix local.hex --force
+            mix format --check-formatted
+            mix credo --strict
+            mix test
+          no_output_timeout: 20m
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
