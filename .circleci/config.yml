@@ -1,0 +1,43 @@
+version: 2
+jobs:
+  build:
+    parallelism: 1
+    working_directory: ~/situation_room
+    docker:
+      - image: circleci/elixir:1.13
+        environment:
+          MIX_ENV: "test"
+          CIRCLE_PROJECT_REPONAME: "situation_room"
+      - image: postgres:14
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: situation_test
+          POSTGRES_PASSWORD: postgres
+    steps:
+      - checkout
+      - run: mix local.hex --force # force install Hex (without prompting)
+      - run: mix local.rebar --force # force install rebar (without prompting)
+      - restore_cache: # restore saved mix cache
+          keys:
+            - v1-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
+      - restore_cache: # restore saved build cache
+          keys:
+            - v1-build-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
+      - run: mix do deps.get, compile # get deps and compile them
+      - save_cache:
+          key: v1-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
+          paths:
+            - "deps"
+      - run: 
+          name: Run tests
+          command: |-
+            echo "Runnings Tests"
+            mix format --check-formatted
+            mix credo -a
+            mix test
+      - save_cache:
+          key: v1-build-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
+          paths:
+            - "_build"
+      - store_test_results:
+          path: _build/test

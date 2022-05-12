@@ -5,7 +5,7 @@ defmodule SituationRoom.MixProject do
     [
       app: :situation_room,
       version: "0.1.0",
-      elixir: "~> 1.13.4",
+      elixir: "~> 1.13.1",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       aliases: aliases()
@@ -23,6 +23,7 @@ defmodule SituationRoom.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:credo, "~> 1.6"},
       {:ecto, "~> 3.7.2"},
       {:ecto_sql, "~> 3.7.2"},
       {:plug_cowboy, "~> 2.5.2"},
