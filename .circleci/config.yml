@@ -8,9 +8,6 @@ jobs:
           CIRCLE_PROJECT_REPONAME: "situation_room"
     working_directory: ~/situation_room
     steps:
-      - add_ssh_keys:
-          fingerprints:
-            - "cd:34:33:6d:69:e6:15:6f:c1:eb:d1:96:ab:de:b2:0e"
       - checkout
       - restore_cache:  # restores saved mix cache
           keys:  # list of cache keys, in decreasing specificity
