@@ -1,0 +1,30 @@
+version: 2
+jobs:
+  build:
+    parallelism: 1
+    working_directory: ~/app
+    docker:
+      - image: circleci/elixir:1.13
+    steps:
+      - checkout
+      - run: mix local.hex --force # force install Hex (without prompting)
+      - run: mix local.rebar --force # force install rebar (without prompting)
+      - restore_cache: # restore saved mix cache
+          keys:
+            - v1-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
+      - restore_cache: # restore saved build cache
+          keys:
+            - v1-build-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
+      - run: mix do deps.get, compile # get deps and compile them
+      - save_cache:
+          key: v1-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
+          paths:
+            - "deps"
+      - run: mix credo -a
+      - run: mix test
+      - save_cache:
+          key: v1-build-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
+          paths:
+            - "_build"
+      - store_test_results:
+          path: _build/test
