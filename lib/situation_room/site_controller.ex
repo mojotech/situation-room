@@ -3,29 +3,37 @@ defmodule SituationRoom.Site.Controller do
   use Plug.Router
 
   plug(:match)
-  # If we are going to include plug.Parsers, they go right here
+
+  plug(Plug.Parsers,
+    parsers: [:urlencoded, :multipart],
+    pass: ["text/*"]
+  )
+
   plug(:dispatch)
 
-  # Get a site by name
-  get "/name/:name" do
-    get_site_by(conn, name: conn.params["name"])
-  end
-
-  # Get a site by endpoint/url
-  get "/endpoint/:endpoint" do
-    get_site_by(conn, endpoint: conn.params["endpoint"])
+  # Get all sites
+  get "/" do
+    send_resp(
+      conn,
+      200,
+      "[#{for content <- Site.get_all_sites(), do: "#{build_site_resp(content)}, "}]"
+    )
   end
 
   # Get a site by id
-  get "/id/:id" do
+  get "/:id" do
+    if not is_integer(conn.params["id"]) do
+      send_resp(conn, 400, "{'error': 'Expected id to be of type integer'}")
+    end
+
     get_site_by(conn, id: conn.params["id"])
   end
 
   # This route can be hit when forward slashes are encoded as %2F
-  post "/:name/:endpoint" do
-    case res = Site.create_site(conn.params["name"], conn.params["endpoint"]) do
-      {:ok, _} ->
-        send_resp(conn, 201, "{:ok, 'Successfully created #{conn.params["endpoint"]}'}")
+  post "/" do
+    case Site.create_site(conn.params["name"], conn.params["endpoint"]) do
+      {:ok, content} ->
+        send_resp(conn, 201, build_site_resp(content))
 
       # We need to pattern match errors for invalid URL
       {:error,
@@ -36,44 +44,43 @@ defmodule SituationRoom.Site.Controller do
          data: _,
          valid?: false
        }} ->
-        send_resp(conn, 400, "{:error, '#{elem(errors, 0)}'}")
+        send_resp(conn, 400, "{'error': '#{elem(errors, 0)}'}")
 
       _ ->
-        send_resp(conn, 400, "{:error, 'Unable to create #{conn.params["endpoint"]}'}")
+        send_resp(conn, 400, "{'error': 'Unable to create #{conn.params["endpoint"]}'}")
     end
   end
 
   # This route can be hit when forward slashes are encoded as %2F
-  delete "/:endpoint" do
-    case Site.delete_site(endpoint: conn.params["endpoint"]) do
-      {:ok, _} ->
-        send_resp(conn, 201, "{:ok, '#{conn.params["endpoint"]} has been deleted'}")
+  delete "/:id" do
+    case Site.delete_site(id: conn.params["id"]) do
+      {:ok, content} ->
+        send_resp(conn, 201, build_site_resp(content))
 
       _ ->
-        IO.inspect("Pattern matched catch all")
-        send_resp(conn, 400, "{:error, 'Unable to delete #{conn.params["endpoint"]}'}")
+        send_resp(conn, 400, "{'error': 'Unable to delete #{conn.params["id"]}'}")
     end
   end
 
   match _ do
-    send_resp(conn, 404, "We couldn't find the specified site route.. ")
+    send_resp(conn, 404, "Not Found")
   end
 
   defp get_site_by(conn, field) do
-    case res = Site.get_site(field) do
-      %SituationRoom.Site{} = res ->
-        send_resp(
-          conn,
-          200,
-          "{:ok, {'name': #{Map.get(res, :name)}, 'endpoint': '#{Map.get(res, :endpoint)}', 'id': '#{Map.get(res, :id)}'}}"
-        )
+    case Site.get_site(field) do
+      res = %SituationRoom.Site{} ->
+        send_resp(conn, 200, build_site_resp(res))
 
       _ ->
         send_resp(
           conn,
           400,
-          "{:error, '#{elem(List.first(field), 1)} was not be found.. Please make sure everything is entered correctly.'}"
+          "{'error': 'Site #{elem(List.first(field), 1)} was not be found..'}"
         )
     end
+  end
+
+  defp build_site_resp(content) do
+    "{'name': '#{content.name}', 'endpoint': '#{content.endpoint}', 'id': '#{content.id}'}"
   end
 end

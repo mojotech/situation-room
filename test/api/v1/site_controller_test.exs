@@ -5,110 +5,91 @@ defmodule SituationRoom.Site.ControllerTest do
   alias SituationRoom.Site
 
   @opts Router.init([])
-  @test_site {"testName", "https://test.com", "https:%2F%2Ftest.com", "https://test.asdfg",
-              "https:%2F%2Ftest.asdfg"}
+
+  @test_site {"testName", "https://test.com", "https:%2F%2Ftest.com"}
   @test_name elem(@test_site, 0)
   @test_url elem(@test_site, 1)
   @test_url_http elem(@test_site, 2)
-  @test_url_invalid elem(@test_site, 3)
-  @test_url_invalid_http elem(@test_site, 4)
 
   setup do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(SituationRoom.Repo)
-    seed()
+    seed
   end
 
   describe "test CRUD methods" do
     test "test POST site" do
-      conn = conn(:post, "/site/#{@test_name}/#{@test_url_http}")
+      conn = conn(:post, "/sites/?name=#{@test_name}&endpoint=#{@test_url_http}")
       conn = Router.call(conn, @opts)
       assert conn.state == :sent
       assert conn.status == 201
-      assert conn.resp_body == "{:ok, 'Successfully created #{@test_url}'}"
-    end
-
-    test "test GET site by name" do
-      conn = conn(:get, "/site/name/#{@test_name}")
-      conn = Router.call(conn, @opts)
-      assert conn.state == :sent
-      assert conn.status == 200
 
       assert String.starts_with?(
                conn.resp_body,
-               "{:ok, {'name': #{@test_name}, 'endpoint': '#{@test_url}', 'id': "
+               "{'name': '#{@test_name}', 'endpoint': '#{@test_url}', 'id': "
              )
     end
 
-    test "test GET site by endpoint" do
-      conn = conn(:get, "/site/endpoint/#{@test_url_http}")
-      conn = Router.call(conn, @opts)
-      assert conn.state == :sent
-      assert conn.status == 200
-
-      assert String.starts_with?(
-               conn.resp_body,
-               "{:ok, {'name': #{@test_name}, 'endpoint': '#{@test_url}', 'id': "
-             )
-    end
-
-    test "test DEL site" do
-      conn = conn(:delete, "/site/#{@test_url_http}")
-      conn = Router.call(conn, @opts)
-      assert conn.state == :sent
-      assert conn.status == 201
-      assert conn.resp_body == "{:ok, '#{@test_url} has been deleted'}"
-    end
-
-    test "invalid test POST site - not url encoded //" do
-      conn = conn(:post, "/site/#{@test_name}/#{@test_url}")
+    test "test GET site by id" do
+      conn = conn(:get, "/sites/name/#{@test_name}")
       conn = Router.call(conn, @opts)
       assert conn.state == :sent
       assert conn.status == 404
+      assert conn.resp_body == "Not Found"
+    end
+
+    test "test DEL site", state do
+      conn = conn(:delete, "/sites/#{state[:insert_id]}")
+      conn = Router.call(conn, @opts)
+      assert conn.state == :sent
+      assert conn.status == 201
+
+      assert conn.resp_body ==
+               "{'name': '#{@test_name}', 'endpoint': '#{@test_url}', 'id': '#{state[:insert_id]}'}"
     end
 
     test "invalid test POST site - invalid host" do
-      conn = conn(:post, "/site/#{@test_name}/#{@test_url_invalid_http}")
+      conn = conn(:post, "/sites?name=#{@test_name}&endpoint=#{@test_url_http}badhost")
       conn = Router.call(conn, @opts)
       assert conn.state == :sent
       assert conn.status == 400
-      assert conn.resp_body == "{:error, 'invalid host'}"
+      assert conn.resp_body == "{'error': 'invalid host'}"
+    end
+
+    test "invalid test POST site - cant be blank" do
+      conn = conn(:post, "/sites?name=#{@test_name}&endpoint=")
+      conn = Router.call(conn, @opts)
+      assert conn.state == :sent
+      assert conn.status == 400
+      assert conn.resp_body == "{'error': 'can't be blank'}"
     end
 
     test "invalid test POST site - missing scheme" do
-      conn = conn(:post, "/site/#{@test_name}/#{@test_name}")
+      conn = conn(:post, "/sites?name=#{@test_name}&endpoint=#{@test_name}")
       conn = Router.call(conn, @opts)
       assert conn.state == :sent
       assert conn.status == 400
-      assert conn.resp_body == "{:error, 'is missing a scheme (e.g. https)'}"
+      assert conn.resp_body == "{'error': 'is missing a scheme (e.g. https)'}"
     end
 
     test "invalid test GET site - does not exist" do
-      conn = conn(:get, "/site/name/F#{@test_name}")
+      conn = conn(:get, "/sites/345324562")
       conn = Router.call(conn, @opts)
       assert conn.state == :sent
       assert conn.status == 400
-
-      assert conn.resp_body ==
-               "{:error, 'F#{@test_name} was not be found.. Please make sure everything is entered correctly.'}"
+      assert conn.resp_body == "{'error': 'Site 345324562 was not be found..'}"
     end
 
-    test "invalid test DEL site - nonexistant site" do
-      conn = conn(:delete, "/site/#{@test_url_invalid_http}")
+    test "invalid test DEL site - nonexistant id" do
+      conn = conn(:delete, "/sites/a")
       conn = Router.call(conn, @opts)
       assert conn.state == :sent
       assert conn.status == 400
-      assert conn.resp_body == "{:error, 'Unable to delete #{@test_url_invalid}'}"
+      assert conn.resp_body == "{'error': 'Unable to delete a'}"
     end
   end
 
-  defp seed() do
-    case res = Site.get_site(name: @test_name) do
-      nil = res ->
-        Site.create_site(@test_name, @test_url)
-        :ok
-
-      _ ->
-        :ok
-    end
+  defp seed do
+    {:ok, res} = Site.create_site(@test_name, @test_url)
+    {:ok, insert_id: res.id}
   end
 end

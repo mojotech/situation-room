@@ -16,9 +16,9 @@ defmodule SituationRoom.Router do
     send_resp(conn, 200, "{:ok, Mojo Pong}")
   end
 
-  forward("/site", to: SituationRoom.Site.Controller)
+  forward("/sites", to: SituationRoom.Site.Controller)
 
   match _ do
-    send_resp(conn, 404, "We couldn't the specified route :(")
+    send_resp(conn, 404, "Not Found")
   end
 end

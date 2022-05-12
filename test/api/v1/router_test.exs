@@ -17,4 +17,13 @@ defmodule SituationRoom.RouterTest do
     assert conn.status == 200
     assert conn.resp_body == "{:ok, Mojo Pong}"
   end
+
+  test "invalid route" do
+    conn = conn(:get, "/invalidRouteZYX")
+    conn = Router.call(conn, @opts)
+
+    assert conn.state == :sent
+    assert conn.status == 404
+    assert conn.resp_body == "Not Found"
+  end
 end
