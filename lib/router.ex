@@ -12,9 +12,9 @@ defmodule SituationRoom.Router do
   # If we are going to include plug.Parsers, they go right here
   plug(:dispatch)
 
-  get "/ping" do
-    send_resp(conn, 200, "{:ok, Mojo Pong}")
-  end
+  get("/", do: send_resp(conn, 204, ""))
+  get("/ping", do: send_resp(conn, 204, ""))
+  get("/status", do: send_resp(conn, 204, ""))
 
   forward("/sites", to: SituationRoom.Site.Controller)
 
