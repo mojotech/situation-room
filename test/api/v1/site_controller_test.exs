@@ -75,8 +75,8 @@ defmodule SituationRoom.Site.ControllerTest do
       conn = conn(:get, "/sites/345324562")
       conn = Router.call(conn, @opts)
       assert conn.state == :sent
-      assert conn.status == 400
-      assert conn.resp_body == "{'error': 'Site 345324562 was not be found..'}"
+      assert conn.status == 404
+      assert conn.resp_body == "Not Found"
     end
 
     test "invalid test DEL site - nonexistant id" do

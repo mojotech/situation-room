@@ -25,10 +25,6 @@ defmodule SituationRoom.Site.Controller do
 
   # Get a site by id
   get "/:id" do
-    if not is_integer(conn.params["id"]) do
-      send_resp(conn, 400, "{'error': 'Expected id to be of type integer'}")
-    end
-
     get_site_by(conn, id: conn.params["id"])
   end
 
@@ -77,8 +73,8 @@ defmodule SituationRoom.Site.Controller do
       _ ->
         send_resp(
           conn,
-          400,
-          "{'error': 'Site #{elem(List.first(field), 1)} was not be found..'}"
+          404,
+          "Not Found"
         )
     end
   end

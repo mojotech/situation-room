@@ -56,7 +56,6 @@ defmodule SituationRoom.Site do
     site
     |> cast(params, [:endpoint, :name])
     |> validate_required([:endpoint, :name])
-    # Should we split this up to validate scheme, host, and valid endpoint?
     |> validate_endpoint(:endpoint)
   end
 
