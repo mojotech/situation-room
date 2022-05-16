@@ -26,6 +26,7 @@ defmodule SituationRoom.MixProject do
       {:credo, "~> 1.6"},
       {:ecto, "~> 3.7.2"},
       {:ecto_sql, "~> 3.7.2"},
+      {:jason, "~> 1.3"},
       {:plug_cowboy, "~> 2.5.2"},
       {:postgrex, "~> 0.16.2"}
       # {:dep_from_hexpm, "~> 0.3.0"},
