@@ -33,7 +33,7 @@ defmodule SituationRoom.Site do
 
   # Returns all sites in the database
   def get_all_sites() do
-    "[#{for content <- Repo.all(SituationRoom.Site), do: "#{build_site_resp(content)}, "}]"
+    for content <- Repo.all(SituationRoom.Site), do: build_site_resp(content)
   end
 
   # Creates a site in the database by taking two String.t() params
@@ -49,7 +49,7 @@ defmodule SituationRoom.Site do
       # We need to pattern match errors for invalid URL
       {:error,
        %Ecto.Changeset{
-         action: nil,
+         action: _,
          changes: %{},
          errors: [endpoint: errors],
          data: _,
@@ -65,14 +65,12 @@ defmodule SituationRoom.Site do
   # Delete a site from the database by specifying specific field
   # param ex: (name: "mojotech") or (endpoint: "http://mojo.com")
   def delete_site(param) do
-    case res = Repo.get_by(SituationRoom.Site, param) do
-      %SituationRoom.Site{} ->
-        {:ok, content} = Repo.delete(res)
-        {:ok, build_site_resp(content)}
-
-      _ ->
-        {:error, "Not Found"}
-    end
+    {:ok, _} =
+      SituationRoom.Site
+      |> Repo.get_by(param)
+      |> Repo.delete()
+  rescue
+    _ -> {:error, "Not Found"}
   end
 
   # Function to test if a url is valid and returns why it is not valid
@@ -103,6 +101,6 @@ defmodule SituationRoom.Site do
   end
 
   defp build_site_resp(content) do
-    "{'name': '#{content.name}', 'endpoint': '#{content.endpoint}', 'id': '#{content.id}'}"
+    %{name: content.name, endpoint: content.endpoint, id: content.id}
   end
 end

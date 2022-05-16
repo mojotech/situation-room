@@ -1,4 +1,5 @@
 defmodule SituationRoom.Site.ControllerTest do
+  import Jason, only: [encode!: 2, decode: 2]
   use ExUnit.Case, async: false
   use Plug.Test
   alias SituationRoom.Router
@@ -17,34 +18,21 @@ defmodule SituationRoom.Site.ControllerTest do
   end
 
   describe "test CRUD methods" do
-    test "test POST site" do
-      conn = conn(:post, "/sites/?name=#{@test_name}&endpoint=#{@test_url_http}")
+    test "test POST site", state do
+      conn = conn(:post, "/sites", %{"name" => @test_name, "endpoint" => @test_url})
       conn = Router.call(conn, @opts)
       assert conn.state == :sent
       assert conn.status == 201
 
-      assert String.starts_with?(
-               conn.resp_body,
-               "{'name': '#{@test_name}', 'endpoint': '#{@test_url}', 'id': "
-             )
-    end
-
-    test "test GET site by id" do
-      conn = conn(:get, "/sites/name/#{@test_name}")
-      conn = Router.call(conn, @opts)
-      assert conn.state == :sent
-      assert conn.status == 404
-      assert conn.resp_body == "Not Found"
+      assert {:ok, conn.resp_body} ==
+               Jason.encode(%{name: @test_name, endpoint: @test_url, id: state[:insert_id] + 1})
     end
 
     test "test DEL site", state do
       conn = conn(:delete, "/sites/#{state[:insert_id]}")
       conn = Router.call(conn, @opts)
       assert conn.state == :sent
-      assert conn.status == 201
-
-      assert conn.resp_body ==
-               "{'name': '#{@test_name}', 'endpoint': '#{@test_url}', 'id': '#{state[:insert_id]}'}"
+      assert conn.status == 204
     end
 
     test "invalid test POST site - invalid host" do
@@ -52,23 +40,23 @@ defmodule SituationRoom.Site.ControllerTest do
       conn = Router.call(conn, @opts)
       assert conn.state == :sent
       assert conn.status == 400
-      assert conn.resp_body == "{'error': 'invalid host'}"
+      assert conn.resp_body == "invalid host"
     end
 
     test "invalid test POST site - cant be blank" do
-      conn = conn(:post, "/sites?name=#{@test_name}&endpoint=")
+      conn = conn(:post, "/sites", %{"name" => @test_name, "endpoint" => ""})
       conn = Router.call(conn, @opts)
       assert conn.state == :sent
       assert conn.status == 400
-      assert conn.resp_body == "{'error': 'can't be blank'}"
+      assert conn.resp_body == "can't be blank"
     end
 
     test "invalid test POST site - missing scheme" do
-      conn = conn(:post, "/sites?name=#{@test_name}&endpoint=#{@test_name}")
+      conn = conn(:post, "/sites", %{"name" => @test_name, "endpoint" => @test_name})
       conn = Router.call(conn, @opts)
       assert conn.state == :sent
       assert conn.status == 400
-      assert conn.resp_body == "{'error': 'is missing a scheme (e.g. https)'}"
+      assert conn.resp_body == "is missing a scheme (e.g. https)"
     end
 
     test "invalid test GET site - does not exist" do
@@ -83,8 +71,8 @@ defmodule SituationRoom.Site.ControllerTest do
       conn = conn(:delete, "/sites/a")
       conn = Router.call(conn, @opts)
       assert conn.state == :sent
-      assert conn.status == 400
-      assert conn.resp_body == "{'error': 'Unable to delete a'}"
+      assert conn.status == 404
+      assert conn.resp_body == "Not Found"
     end
   end
 

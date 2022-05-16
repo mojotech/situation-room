@@ -3,14 +3,15 @@ defmodule SituationRoom.Site.Controller do
   Documentation for `SituationRoom.Site.Controller`.
   """
   import Jason, only: [encode!: 2]
-  alias SituationRoom.Site
   use Plug.Router
+  alias SituationRoom.Site
 
   plug(:match)
 
   plug(Plug.Parsers,
     parsers: [:urlencoded, :multipart],
-    pass: ["text/*"]
+    pass: ["text/*"],
+    json_decoder: Jason
   )
 
   plug(:dispatch)
@@ -51,8 +52,8 @@ defmodule SituationRoom.Site.Controller do
   # This route can be hit when forward slashes are encoded as %2F
   delete "/:id" do
     case Site.delete_site(id: conn.params["id"]) do
-      {:ok, content} ->
-        send_resp(conn, 200, Jason.encode!(content))
+      {:ok, _} ->
+        send_resp(conn, 204, "")
 
       {:error, message} ->
         send_resp(conn, 404, message)
