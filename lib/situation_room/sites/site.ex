@@ -10,6 +10,7 @@ defmodule SituationRoom.Site do
   schema "sites" do
     field(:endpoint, :string)
     field(:name, :string)
+    has_many(:site_checks, SituationRoom.Site.Check)
   end
 
   # Default changeset to be used to validate against schema
