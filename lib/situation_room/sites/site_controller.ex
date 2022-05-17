@@ -66,6 +66,8 @@ defmodule SituationRoom.Site.Controller do
     end
   end
 
+  forward("/:id/checks", to: SituationRoom.Site.Check.Controller)
+
   match _ do
     send_resp(conn, 404, "Not Found")
   end
