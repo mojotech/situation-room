@@ -21,25 +21,37 @@ defmodule SituationRoom.Site do
 
   # Get a site from the database by one specific field
   # param ex: (name: "mojotech") or (endpoint: "http://mojo.com")
-  def get_site(param) do
-    case Repo.get_by(SituationRoom.Site, param) do
-      {:ok, content} ->
-        {:ok, build_site_resp(content)}
 
-      _ ->
-        {:error, "Not Found"}
-    end
+  def get_site(id) when is_binary(id) do
+    get_site(id: id)
+  end
+
+  def get_site(param) do
+    Repo.get_by(SituationRoom.Site, param)
+    # case Repo.get_by(SituationRoom.Site, param) do
+    #   {:ok, content} ->
+    #     {:ok, build_site_resp(content)}
+
+    #   _ ->
+    #     {:error, "Not Found"}
+    # end
   end
 
   # Returns all sites in the database
   def get_all_sites() do
-    for content <- Repo.all(SituationRoom.Site), do: build_site_resp(content)
+    Repo.all(SituationRoom.Site)
+    # for content <- Repo.all(SituationRoom.Site), do: build_site_resp(content)
   end
 
   # Creates a site in the database by taking two String.t() params
   # param ex: ("mojo", "http://mojotech.com")
   @spec create_site(String.t(), String.t()) :: {:ok, Site.t()} | {:error, Site.t()}
-  def create_site(name, endpoint) do
+  # def create_site(name, endpoint) do
+  def create_site(params) do
+    %SituationRoom.Site{}
+    |> changeset(params)
+    |> Repo.insert()
+
     case Repo.insert(changeset(%SituationRoom.Site{}, %{"name" => name, "endpoint" => endpoint}),
            on_conflict: :nothing
          ) do
@@ -64,13 +76,21 @@ defmodule SituationRoom.Site do
 
   # Delete a site from the database by specifying specific field
   # param ex: (name: "mojotech") or (endpoint: "http://mojo.com")
-  def delete_site(param) do
-    {:ok, _} =
-      SituationRoom.Site
-      |> Repo.get_by(param)
-      |> Repo.delete()
+  def delete_site(id) do
+    Repo.delete(%SituationRoom.Site{id: id})
   rescue
-    _ -> {:error, "Not Found"}
+    Ecto.StaleEntryError ->
+      {:error, :not_found}
+
+    _ ->
+      {:error, :unknown}
+
+      #   {:ok, _} =
+      #     SituationRoom.Site
+      #     |> Repo.get_by(param)
+      #     |> Repo.delete()
+      # rescue
+      #   _ -> {:error, "Not Found"}
   end
 
   # Function to test if a url is valid and returns why it is not valid
