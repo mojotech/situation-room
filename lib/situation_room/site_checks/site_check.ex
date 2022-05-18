@@ -2,7 +2,7 @@ defmodule SituationRoom.Site.Check do
   @moduledoc """
   Documentation for `SituationRoom.Ping`.
   """
-  @derive {Jason.Encoder, except: [:__meta__]}
+  @derive {Jason.Encoder, except: [:__meta__, :site]}
   use Ecto.Schema
   import Ecto.Changeset
   alias SituationRoom.Repo

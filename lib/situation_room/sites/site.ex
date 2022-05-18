@@ -6,7 +6,7 @@ defmodule SituationRoom.Site do
   import Ecto.Changeset
   alias SituationRoom.Repo
 
-  @derive {Jason.Encoder, except: [:__meta__]}
+  @derive {Jason.Encoder, except: [:__meta__, :site_checks]}
   schema "sites" do
     field(:endpoint, :string)
     field(:name, :string)

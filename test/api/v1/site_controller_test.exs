@@ -1,5 +1,4 @@
 defmodule SituationRoom.Site.ControllerTest do
-  import Jason, only: [encode!: 2, decode: 2]
   use ExUnit.Case, async: false
   use Plug.Test
   alias SituationRoom.Router
