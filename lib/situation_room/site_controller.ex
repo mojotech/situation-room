@@ -40,6 +40,13 @@ defmodule SituationRoom.Site.Controller do
       {:ok, content} ->
         send_resp(conn, 201, Jason.encode!(content))
 
+      {:error, changeset} ->
+        send_resp(
+          conn,
+          400,
+          Jason.encode!(Ecto.Changeset.traverse_errors(changeset, fn {msg, _} -> msg end))
+        )
+
       _ ->
         send_resp(conn, 400, "Cannot POST site")
     end

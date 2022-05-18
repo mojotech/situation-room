@@ -2,11 +2,11 @@ defmodule SituationRoom.Site do
   @moduledoc """
   Documentation for `SituationRoom.Site`.
   """
-  @derive {Jason.Encoder, only: [:id, :name, :endpoint]}
   use Ecto.Schema
   import Ecto.Changeset
   alias SituationRoom.Repo
 
+  @derive {Jason.Encoder, except: [:__meta__]}
   schema "sites" do
     field(:endpoint, :string)
     field(:name, :string)
