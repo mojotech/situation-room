@@ -34,6 +34,30 @@ situation_room-*.tar
 # Temporary files, for example, from tests.
 /tmp/
 
-# Future Use JS Client migrated from old .gitignore
-client/node_modules
-client/public
+# next js client:
+# dependencies
+/client/node_modules
+/client/.pnp
+/client/.pnp.js
+
+# testing
+/client/coverage
+
+# next.js
+/client/.next/
+/client/out/
+
+# production
+/client/build
+
+# debug
+/client/npm-debug.log*
+/client/yarn-debug.log*
+/client/yarn-error.log*
+/client/.pnpm-debug.log*
+
+# local env files
+/client/.env*.local
+
+# typescript
+*.tsbuildinfo
