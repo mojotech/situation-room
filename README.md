@@ -11,6 +11,16 @@ Updates will soon follow.
 
 This will be populated as the elixir features are built out.
 
+## Getting things Running:
+1. create `.envrc` and copy contents from `.sample.envrc`
+2. run `mix deps.get`
+3. run `docker-compose up -d`
+4. run `mix Ecto.create`
+5. run `mix Ecto.migrate`
+6. to make sure everything is working, run `mix test`
+7. In one terminal, run `mix run --no-halt`
+8. In another terminal, `cd client` and `yarn run dev`
+
 
 [1]: https://www.pingdom.com/
 [5]: https://sqlite.org/
