@@ -18,7 +18,7 @@ defmodule SituationRoom.RouterTest do
   end
 
   test "return /status route" do
-    conn = conn(:get, "/ping")
+    conn = conn(:get, "/status")
     conn = Router.call(conn, @opts)
 
     assert conn.state == :sent
@@ -26,7 +26,7 @@ defmodule SituationRoom.RouterTest do
   end
 
   test "return / route" do
-    conn = conn(:get, "/ping")
+    conn = conn(:get, "/")
     conn = Router.call(conn, @opts)
 
     assert conn.state == :sent
