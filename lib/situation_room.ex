@@ -1,9 +1,9 @@
 defmodule SituationRoom do
   @moduledoc """
-  Documentation for `SituationRoom`.
-  """
+  SituationRoom keeps the contexts that define your domain
+  and business logic.
 
-  def hello do
-    :world
-  end
+  Contexts are also responsible for managing your data, regardless
+  if it comes from the database, an external API or others.
+  """
 end
