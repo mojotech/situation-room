@@ -2,8 +2,8 @@ import Config
 
 config :situation_room, SituationRoom.Repo,
   adapter: Ecto.Adapters.Postgres,
-  database: System.get_env("POSTGRES_DATABASE"),
-  username: System.get_env("POSTGRES_USERNAME"),
+  database: System.get_env("POSTGRES_DB"),
+  username: System.get_env("POSTGRES_USER"),
   password: System.get_env("POSTGRES_PASSWORD"),
   hostname: System.get_env("POSTGRES_HOSTNAME"),
   # Correlates directly with database timeout error
