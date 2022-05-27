@@ -6,7 +6,14 @@ defmodule SituationRoomWeb.SiteLive do
   def render(assigns) do
     ~H"""
     <section class="phx-hero">
-      <%= @sites %>
+      <%= for site <- @sites do %>
+        <div>
+          <h1><%= site.name %></h1>
+          <h3>
+            <%= site.endpoint %>
+          </h3>
+        </div>
+      <%= end %>
     </section>
     """
   end
