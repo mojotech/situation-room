@@ -49,10 +49,10 @@ defmodule SituationRoom.Site.ControllerTest do
   end
 
   defp seed do
-    alias SituationRoom.Site
+    alias SituationRoom.Sites
 
     {:ok, site} =
-      Site.create_site(%{"name" => @test_name, "endpoint" => @test_url, "interval" => 60})
+      Sites.create_site(%{"name" => @test_name, "endpoint" => @test_url, "interval" => 60})
 
     site
   end

@@ -4,7 +4,6 @@ defmodule SituationRoom.Site do
   """
   use Ecto.Schema
   import Ecto.Changeset
-  alias SituationRoom.Repo
 
   @derive {Jason.Encoder, except: [:__meta__, :site_checks, :site_notifications, :site_outages]}
   schema "sites" do
@@ -24,39 +23,6 @@ defmodule SituationRoom.Site do
     |> cast(params, [:endpoint, :name, :interval])
     |> validate_required([:endpoint, :name, :interval])
     |> validate_endpoint(:endpoint)
-  end
-
-  # Get a site from the database by one specific field
-  # param ex: (name: "mojotech") or (endpoint: "http://mojo.com")
-  def get_site(param) do
-    Repo.get_by(SituationRoom.Site, param)
-  end
-
-  def get_site!(id), do: Repo.get!(SituationRoom.Site, id)
-
-  # Returns all sites in the database
-  def get_all_sites() do
-    Repo.all(SituationRoom.Site)
-  end
-
-  # Creates a site in the database by taking two String.t() params
-  # param ex: ("mojo", "http://mojotech.com")
-  def create_site(params) do
-    %SituationRoom.Site{}
-    |> changeset(params)
-    |> Repo.insert()
-  end
-
-  # Delete a site from the database by specifying specific field
-  # param ex: (name: "mojotech") or (endpoint: "http://mojo.com")
-  def delete_site(site) do
-    Repo.delete(site)
-  end
-
-  def update_site(%__MODULE__{} = site, attrs) do
-    site
-    |> changeset(attrs)
-    |> Repo.update()
   end
 
   # Function to test if a url is valid and returns why it is not valid
