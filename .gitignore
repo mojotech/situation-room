@@ -40,3 +40,6 @@ situation_room-*.tar
 # Future Use JS Client migrated from old .gitignore
 client/node_modules
 client/public
+
+# macOS .DS_Store
+.DS_Store
