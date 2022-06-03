@@ -6,13 +6,14 @@ defmodule SituationRoom.Site do
   import Ecto.Changeset
   alias SituationRoom.Repo
 
-  @derive {Jason.Encoder, except: [:__meta__, :site_checks, :site_notifications]}
+  @derive {Jason.Encoder, except: [:__meta__, :site_checks, :site_notifications, :site_outages]}
   schema "sites" do
     field(:endpoint, :string)
     field(:name, :string)
     field(:interval, :integer, default: 300, null: false)
     has_many(:site_checks, SituationRoom.Site.Check)
     has_many(:site_notifications, SituationRoom.Site.Notification)
+    has_many(:site_outages, SituationRoom.Site.Outage)
 
     timestamps()
   end
