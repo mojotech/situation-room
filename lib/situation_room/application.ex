@@ -15,9 +15,11 @@ defmodule SituationRoom.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: SituationRoom.PubSub},
       # Start the Endpoint (http/https)
-      SituationRoomWeb.Endpoint
+      SituationRoomWeb.Endpoint,
       # Start a worker by calling: SituationRoom.Worker.start_link(arg)
       # {SituationRoom.Worker, arg}
+      {Finch, name: SituationRoom.Finch},
+      SituationRoom.ChecksSupervisor
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
