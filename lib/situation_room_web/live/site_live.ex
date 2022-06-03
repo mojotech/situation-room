@@ -13,7 +13,7 @@ defmodule SituationRoomWeb.SiteLive do
             <%= site.endpoint %>
           </h3>
         </div>
-      <%= end %>
+      <% end %>
     </section>
     """
   end
