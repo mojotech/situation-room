@@ -53,7 +53,11 @@ defmodule SituationRoom.Site.CheckTest do
 
   defp seed do
     {:ok, site} =
-      SituationRoom.Site.create_site(%{"name" => "TestSite", "endpoint" => "https://test.com"})
+      SituationRoom.Site.create_site(%{
+        "name" => "TestSite",
+        "endpoint" => "https://test.com",
+        "interval" => 60
+      })
 
     site
   end
