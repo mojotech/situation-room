@@ -5,15 +5,16 @@ defmodule SituationRoomWeb.SiteController do
   use SituationRoomWeb, :controller
 
   alias SituationRoom.Site
+  alias SituationRoom.Sites
 
   # Get all sites
   def index(conn, _params) do
     conn
-    |> render("index.html", sites: Site.get_all_sites())
+    |> render("index.html", sites: Sites.get_all_sites())
   end
 
   def show(conn, %{"id" => id}) do
-    case Site.get_site(%{id: id}) do
+    case Sites.get_site(%{id: id}) do
       %SituationRoom.Site{} = site ->
         conn
         |> render("show.html", site: site)
@@ -33,7 +34,7 @@ defmodule SituationRoomWeb.SiteController do
   end
 
   def create(conn, %{"site" => site_params}) do
-    case Site.create_site(site_params) do
+    case Sites.create_site(site_params) do
       {:ok, site} ->
         conn
         |> put_flash(:info, "Site created successfully.")
@@ -45,7 +46,7 @@ defmodule SituationRoomWeb.SiteController do
   end
 
   def edit(conn, %{"id" => id}) do
-    site = Site.get_site!(id)
+    site = Sites.get_site!(id)
     changeset = Site.changeset(site)
 
     conn
@@ -53,9 +54,9 @@ defmodule SituationRoomWeb.SiteController do
   end
 
   def update(conn, %{"id" => id, "site" => site_params}) do
-    site = Site.get_site!(id)
+    site = Sites.get_site!(id)
 
-    case Site.update_site(site, site_params) do
+    case Sites.update_site(site, site_params) do
       {:ok, site} ->
         conn
         |> put_flash(:info, "Site updated successfully.")
@@ -67,8 +68,8 @@ defmodule SituationRoomWeb.SiteController do
   end
 
   def delete(conn, %{"id" => id}) do
-    site = Site.get_site!(id)
-    {:ok, _site} = Site.delete_site(site)
+    site = Sites.get_site!(id)
+    {:ok, _site} = Sites.delete_site(site)
 
     conn
     |> put_flash(:info, "Site deleted successfully.")

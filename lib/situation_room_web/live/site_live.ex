@@ -20,7 +20,7 @@ defmodule SituationRoomWeb.SiteLive do
   end
 
   def mount(_params, %{}, socket) do
-    sites = SituationRoom.Site.get_all_sites()
+    sites = SituationRoom.Sites.get_all_sites()
 
     {:ok, assign(socket, :sites, sites)}
   end
