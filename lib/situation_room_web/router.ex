@@ -17,13 +17,7 @@ defmodule SituationRoomWeb.Router do
   scope "/", SituationRoomWeb do
     pipe_through(:browser)
 
-    scope "/sites" do
-      get("/", SiteController, :index)
-      get("/:id/checks", SiteCheckController, :check)
-      get("/:id", SiteController, :show)
-      post("/create", SiteController, :create)
-      delete("/:id", SiteController, :delete)
-    end
+    resources("/sites", SiteController)
 
     live("/", SiteLive)
   end

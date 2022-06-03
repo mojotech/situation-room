@@ -19,7 +19,7 @@ defmodule SituationRoom.Site do
   end
 
   # Default changeset to be used to validate against schema
-  def changeset(site, params) do
+  def changeset(site, params \\ %{}) do
     site
     |> cast(params, [:endpoint, :name, :interval])
     |> validate_required([:endpoint, :name, :interval])
@@ -31,6 +31,8 @@ defmodule SituationRoom.Site do
   def get_site(param) do
     Repo.get_by(SituationRoom.Site, param)
   end
+
+  def get_site!(id), do: Repo.get!(SituationRoom.Site, id)
 
   # Returns all sites in the database
   def get_all_sites() do
@@ -47,15 +49,14 @@ defmodule SituationRoom.Site do
 
   # Delete a site from the database by specifying specific field
   # param ex: (name: "mojotech") or (endpoint: "http://mojo.com")
-  @spec delete_site(String.t()) :: any
-  def delete_site(id) do
-    Repo.delete(%SituationRoom.Site{id: String.to_integer(id)})
-  rescue
-    Ecto.StaleEntryError ->
-      {:error, :not_found}
+  def delete_site(site) do
+    Repo.delete(site)
+  end
 
-    _ ->
-      {:error, :unknown}
+  def update_site(%__MODULE__{} = site, attrs) do
+    site
+    |> changeset(attrs)
+    |> Repo.update()
   end
 
   # Function to test if a url is valid and returns why it is not valid

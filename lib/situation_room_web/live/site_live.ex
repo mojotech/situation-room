@@ -6,6 +6,7 @@ defmodule SituationRoomWeb.SiteLive do
   def render(assigns) do
     ~H"""
     <section class="phx-hero">
+      <%= button "Add New Site", to: Routes.site_path(@socket, :new), method: :get %>
       <%= for site <- @sites do %>
         <div>
           <h1><%= site.name %></h1>
