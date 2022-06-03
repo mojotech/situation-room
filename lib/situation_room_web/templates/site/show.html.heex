@@ -1,0 +1,18 @@
+<h1>Show Site</h1>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @site.name %>
+  </li>
+
+  <li>
+    <strong>Endpoint:</strong>
+    <%= @site.endpoint %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.site_path(@conn, :edit, @site) %></span> |
+<span><%= link "Back", to: Routes.site_path(@conn, :index) %></span>

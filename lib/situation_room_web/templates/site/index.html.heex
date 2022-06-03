@@ -1,0 +1,28 @@
+<h1>Listing Sites</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Endpoint</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for site <- @sites do %>
+    <tr>
+      <td><%= site.name %></td>
+      <td><%= site.endpoint %></td>
+
+      <td>
+        <span><%= link "Show", to: Routes.site_path(@conn, :show, site) %></span>
+        <span><%= link "Edit", to: Routes.site_path(@conn, :edit, site) %></span>
+        <span><%= link "Delete", to: Routes.site_path(@conn, :delete, site), method: :delete, data: [confirm: "Are you sure?"] %></span>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Site", to: Routes.site_path(@conn, :new) %></span>
