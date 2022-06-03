@@ -10,14 +10,15 @@ defmodule SituationRoom.Site do
   schema "sites" do
     field(:endpoint, :string)
     field(:name, :string)
+    field(:interval, :integer, default: 300, null: false)
     has_many(:site_checks, SituationRoom.Site.Check)
   end
 
   # Default changeset to be used to validate against schema
   def changeset(site, params) do
     site
-    |> cast(params, [:endpoint, :name])
-    |> validate_required([:endpoint, :name])
+    |> cast(params, [:endpoint, :name, :interval])
+    |> validate_required([:endpoint, :name, :interval])
     |> validate_endpoint(:endpoint)
   end
 

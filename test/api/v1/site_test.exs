@@ -7,14 +7,14 @@ defmodule SituationRoom.SiteTest do
   end
 
   @test_suites [
-    {"MojoTech Main", "https://youtube.com", true},
-    {"MojoTech API", "http://mail.google.com", true},
-    {"x", "https://x.com", true},
-    {"Flop", "pets.com", false},
-    {"", "https://google.com", false},
-    {"Nope", "F.", false},
-    {"Davo", "", false},
-    {"Uni", "U", false}
+    {"MojoTech Main", "https://youtube.com", 60, true},
+    {"MojoTech API", "http://mail.google.com", 120, true},
+    {"x", "https://x.com", 180, true},
+    {"Flop", "pets.com", 60, false},
+    {"", "https://google.com", 60, false},
+    {"Nope", "F.", "hi", false},
+    {"Davo", "", 60, false},
+    {"Uni", "U", "nope", false}
   ]
 
   for i <- @test_suites do
@@ -26,18 +26,23 @@ defmodule SituationRoom.SiteTest do
       result =
         Site.changeset(%Site{}, %{
           "name" => elem(test_case, 0),
-          "endpoint" => elem(test_case, 1)
+          "endpoint" => elem(test_case, 1),
+          "interval" => elem(test_case, 2)
         })
 
-      assert result.valid? == elem(test_case, 2)
+      assert result.valid? == elem(test_case, 3)
     end
 
     test "Test site creation, query, and deletion #{elem(i, 1)}" do
       test_case = unquote(mac)
-      expected_result = elem(test_case, 2)
+      expected_result = elem(test_case, 3)
 
       create_res =
-        Site.create_site(%{"name" => elem(test_case, 0), "endpoint" => elem(test_case, 1)})
+        Site.create_site(%{
+          "name" => elem(test_case, 0),
+          "endpoint" => elem(test_case, 1),
+          "interval" => elem(test_case, 2)
+        })
 
       if expected_result do
         assert {:ok, res} = create_res

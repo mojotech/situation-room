@@ -20,7 +20,8 @@ defmodule SituationRoomWeb.ControllerCheckTest do
   end
 
   defp seed do
-    {:ok, site} = Site.create_site(%{"name" => "testName", "endpoint" => "https://test.com"})
+    {:ok, site} =
+      Site.create_site(%{"name" => "testName", "endpoint" => "https://test.com", "interval" => 60})
 
     site
   end

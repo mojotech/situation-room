@@ -4,10 +4,11 @@ defmodule SituationRoom.Site.ControllerTest do
 
   alias SituationRoom.Site
 
-  @test_site {"testName", "https://test.com", "https:%2F%2Ftest.com"}
+  @test_site {"testName", "https://test.com", "https:%2F%2Ftest.com", 60}
   @test_name elem(@test_site, 0)
   @test_url elem(@test_site, 1)
   @test_url_http elem(@test_site, 2)
+  @test_interval elem(@test_site, 3)
 
   setup do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(SituationRoom.Repo)
@@ -20,7 +21,7 @@ defmodule SituationRoom.Site.ControllerTest do
         conn
         |> post(
           Routes.site_path(conn, :create),
-          %{"name" => @test_name, "endpoint" => @test_url}
+          %{"name" => @test_name, "endpoint" => @test_url, "interval" => @test_interval}
         )
         |> json_response(201)
 
@@ -39,7 +40,8 @@ defmodule SituationRoom.Site.ControllerTest do
         Routes.site_path(conn, :create),
         %{
           "name" => @test_name,
-          "endpoint" => "#{@test_url_http}badhost"
+          "endpoint" => "#{@test_url_http}badhost",
+          "interval" => @test_interval
         }
       )
       |> json_response(400)
@@ -59,7 +61,8 @@ defmodule SituationRoom.Site.ControllerTest do
   end
 
   defp seed do
-    {:ok, site} = Site.create_site(%{"name" => @test_name, "endpoint" => @test_url})
+    {:ok, site} =
+      Site.create_site(%{"name" => @test_name, "endpoint" => @test_url, "interval" => 60})
 
     site
   end
