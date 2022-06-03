@@ -12,6 +12,8 @@ defmodule SituationRoom.Site do
     field(:name, :string)
     field(:interval, :integer, default: 300, null: false)
     has_many(:site_checks, SituationRoom.Site.Check)
+
+    timestamps()
   end
 
   # Default changeset to be used to validate against schema
