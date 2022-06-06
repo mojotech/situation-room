@@ -98,6 +98,8 @@ defmodule SituationRoomWeb do
       import SituationRoomWeb.ErrorHelpers
       import SituationRoomWeb.Gettext
       alias SituationRoomWeb.Router.Helpers, as: Routes
+
+      use PetalComponents
     end
   end
 
