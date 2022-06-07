@@ -1,28 +1,37 @@
-<h1>Listing Sites</h1>
+<h2 class="mb-4 text-xl">My Sites</h2>
 
-<table>
+<table class="w-full mt-6">
   <thead>
     <tr>
-      <th>Name</th>
-      <th>Endpoint</th>
-
+      <th class="py-2 pr-4 text-left">Name</th>
+      <th class="py-2 pr-4 text-left">Endpoint</th>
+      <th class="py-2 pr-4 text-left">Status</th>
+      <th class="py-2 pr-4 text-left">Check Interval</th>
       <th></th>
     </tr>
   </thead>
   <tbody>
 <%= for site <- @sites do %>
-    <tr>
-      <td><%= site.name %></td>
-      <td><%= site.endpoint %></td>
-
-      <td>
-        <span><%= link "Show", to: Routes.site_path(@conn, :show, site) %></span>
-        <span><%= link "Edit", to: Routes.site_path(@conn, :edit, site) %></span>
-        <span><%= link "Delete", to: Routes.site_path(@conn, :delete, site), method: :delete, data: [confirm: "Are you sure?"] %></span>
+    <tr class="">
+      <td class="py-2 pr-4 text-left">
+        <.link to={Routes.site_path(@conn, :show, site)} label={site.name} class="text-blue-600" title="View Details of Site" />
+      </td>
+      <td class="py-2 pr-4 text-left">
+        <.link to={site.endpoint} label={site.endpoint} title="Go to Endpoint" target="_blank" />
+      </td>
+      <td class="py-2 pr-4 text-left">Coming Soon...</td>
+      <td class="py-2 pr-4 text-left"><%= site.interval %>s</td>
+      <td class="py-2">
+        <span>
+          <.button label="Edit" color="primary" link_type="a" to={Routes.site_path(@conn, :edit, site)} class="mr-2" />
+        </span>
+        <span>
+          <.button label="Delete" color="danger" link_type="a" to={Routes.site_path(@conn, :delete, site)} method={:delete} data={[confirm: "Are you sure?"]} />
+        </span>
       </td>
     </tr>
 <% end %>
   </tbody>
 </table>
 
-<span><%= link "New Site", to: Routes.site_path(@conn, :new) %></span>
+<.button label="Add New Site" color="primary" link_type="a" to={Routes.site_path(@conn, :new)} class="mt-6" />
