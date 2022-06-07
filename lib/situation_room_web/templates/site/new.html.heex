@@ -1,5 +1,5 @@
-<h1>New Site</h1>
+<h2 class="mb-4 text-xl">New Site</h2>
 
 <%= render "form.html", Map.put(assigns, :action, Routes.site_path(@conn, :create)) %>
 
-<span><%= link "Back", to: Routes.site_path(@conn, :index) %></span>
+<.button label="Back to My Sites" color="gray" link_type="a" to={Routes.site_path(@conn, :index)} class="mt-6" />

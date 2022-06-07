@@ -5,15 +5,25 @@
     </div>
   <% end %>
 
-  <%= label f, :name %>
-  <%= text_input f, :name %>
-  <%= error_tag f, :name %>
-
-  <%= label f, :endpoint %>
-  <%= text_input f, :endpoint %>
-  <%= error_tag f, :endpoint %>
-
   <div>
-    <%= submit "Save" %>
+    <.form_label form={f} field={:name} />
+    <.text_input form={f} field={:name} />
+    <.form_field_error form={f} field={:name} class="mt-4" />
+  </div>
+
+  <div class="mt-4">
+    <.form_label form={f} field={:endpoint} />
+    <.text_input form={f} field={:endpoint} />
+    <.form_field_error form={f} field={:endpoint} class="mt-4" />
+  </div>
+
+  <div class="mt-4">
+    <.form_label form={f} field={:interval} />
+    <.select form={f} field={:interval} options={["1 Minute": 60, "5 Minutes": 300, "10 Minutes": 600, "15 Minutes": 900, "1 Hour": 3600]} />
+    <.form_field_error form={f} field={:interval} class="mt-4" />
+  </div>
+
+  <div class="my-4">
+    <.button label="Save" method={:submit} />
   </div>
 </.form>

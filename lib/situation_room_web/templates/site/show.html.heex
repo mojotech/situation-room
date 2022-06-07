@@ -1,4 +1,4 @@
-<h1>Show Site</h1>
+<h1 class="mb-4 text-xl">Site Details: <%= @site.name %></h1>
 
 <ul>
 
@@ -12,7 +12,12 @@
     <%= @site.endpoint %>
   </li>
 
+  <li>
+    <strong>Check Interval:</strong>
+    <%= @site.interval %>s
+  </li>
+
 </ul>
 
-<span><%= link "Edit", to: Routes.site_path(@conn, :edit, @site) %></span> |
-<span><%= link "Back", to: Routes.site_path(@conn, :index) %></span>
+<.button label="Edit Site" color="primary" link_type="a" to={Routes.site_path(@conn, :edit, @site)} class="mt-6 mr-2" />
+<.button label="Back to My Sites" color="gray" link_type="a" to={Routes.site_path(@conn, :index)} class="mt-6" />
