@@ -1,26 +1,24 @@
 <.form let={f} for={@changeset} action={@action}>
   <%= if @changeset.action do %>
-    <div class="alert alert-danger">
-      <p>Oops, something went wrong! Please check the errors below.</p>
-    </div>
+    <div class="my-4"><.alert color="danger" label="Oops, something went wrong! Please check the errors below." /></div>
   <% end %>
 
   <div>
     <.form_label form={f} field={:name} />
     <.text_input form={f} field={:name} />
-    <.form_field_error form={f} field={:name} class="mt-4" />
+    <.form_field_error form={f} field={:name} class="mt-2" />
   </div>
 
   <div class="mt-4">
     <.form_label form={f} field={:endpoint} />
     <.text_input form={f} field={:endpoint} />
-    <.form_field_error form={f} field={:endpoint} class="mt-4" />
+    <.form_field_error form={f} field={:endpoint} class="mt-2" />
   </div>
 
   <div class="mt-4">
     <.form_label form={f} field={:interval} />
     <.select form={f} field={:interval} options={SituationRoom.Sites.CheckIntervals.get_interval_options()} />
-    <.form_field_error form={f} field={:interval} class="mt-4" />
+    <.form_field_error form={f} field={:interval} class="mt-2" />
   </div>
 
   <div class="my-4">
