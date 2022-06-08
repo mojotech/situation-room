@@ -19,7 +19,7 @@
 
   <div class="mt-4">
     <.form_label form={f} field={:interval} />
-    <.select form={f} field={:interval} options={["1 Minute": 60, "5 Minutes": 300, "10 Minutes": 600, "15 Minutes": 900, "1 Hour": 3600]} />
+    <.select form={f} field={:interval} options={SituationRoom.Sites.CheckIntervals.get_interval_options()} />
     <.form_field_error form={f} field={:interval} class="mt-4" />
   </div>
 
