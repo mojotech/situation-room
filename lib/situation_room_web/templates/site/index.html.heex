@@ -20,7 +20,7 @@
         <.link to={site.endpoint} label={site.endpoint} title="Go to Endpoint" target="_blank" />
       </td>
       <td class="py-2 pr-4 text-left">Coming Soon...</td>
-      <td class="py-2 pr-4 text-left"><%= site.interval %>s</td>
+      <td class="py-2 pr-4 text-left"><%= site.interval |> SituationRoom.Sites.CheckIntervals.get_interval_string() %></td>
       <td class="py-2">
         <span>
           <.button label="Edit" color="primary" link_type="a" to={Routes.site_path(@conn, :edit, site)} class="mr-2" />

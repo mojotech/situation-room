@@ -14,7 +14,7 @@
 
   <li>
     <strong>Check Interval:</strong>
-    <%= @site.interval %>s
+    <%= @site.interval |> SituationRoom.Sites.CheckIntervals.get_interval_string() %>
   </li>
 
 </ul>
