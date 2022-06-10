@@ -2,4 +2,4 @@
 
 <%= render "form.html", Map.put(assigns, :action, Routes.site_path(@conn, :create)) %>
 
-<.button label="Back to My Sites" color="gray" link_type="a" to={Routes.site_path(@conn, :index)} class="mt-6" />
+<.button label="Back to My Sites" color="gray" link_type="a" to={Routes.sites_index_path(@conn, :index)} class="mt-6" />
