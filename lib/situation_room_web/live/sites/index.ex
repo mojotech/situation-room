@@ -7,8 +7,16 @@ defmodule SituationRoomWeb.Live.Sites.Index do
 
   @impl true
   def mount(_params, %{}, socket) do
-    sites = Sites.get_all_sites()
+    if connected?(socket), do: Sites.subscribe()
+    {:ok, assign(socket, %{sites: fetch_sites()})}
+  end
 
-    {:ok, assign(socket, %{sites: sites})}
+  @impl true
+  def handle_info({:site_created, site}, socket) do
+    {:noreply, update(socket, :sites, fn sites -> [site | sites] end)}
+  end
+
+  defp fetch_sites do
+    Sites.get_all_sites()
   end
 end
