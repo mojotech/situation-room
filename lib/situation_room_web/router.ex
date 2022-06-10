@@ -17,8 +17,9 @@ defmodule SituationRoomWeb.Router do
   scope "/", SituationRoomWeb do
     pipe_through(:browser)
 
+    # homepage dashboard
+    live("/", Live.Index, :home)
 
-    live("/", SiteLive)
     # sites 
     # sites - live index
     live("/sites", Live.Sites.Index, :index)
