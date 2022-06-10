@@ -7,12 +7,6 @@ defmodule SituationRoomWeb.SiteController do
   alias SituationRoom.Site
   alias SituationRoom.Sites
 
-  # Get all sites
-  def index(conn, _params) do
-    conn
-    |> render("index.html", sites: Sites.get_all_sites())
-  end
-
   def show(conn, %{"id" => id}) do
     case Sites.get_site(%{id: id}) do
       %SituationRoom.Site{} = site ->
@@ -73,6 +67,6 @@ defmodule SituationRoomWeb.SiteController do
 
     conn
     |> put_flash(:info, "Site deleted successfully.")
-    |> redirect(to: Routes.site_path(conn, :index))
+    |> redirect(to: Routes.sites_index_path(conn, :index))
   end
 end

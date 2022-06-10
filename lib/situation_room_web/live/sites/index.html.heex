@@ -14,7 +14,7 @@
 <%= for site <- @sites do %>
     <tr class="">
       <td class="py-2 pr-4 text-left">
-        <.link to={Routes.site_path(@conn, :show, site)} label={site.name} class="text-blue-600" title="View Details of Site" />
+        <.link to={Routes.site_path(@socket, :show, site)} label={site.name} class="text-blue-600" title="View Details of Site" />
       </td>
       <td class="py-2 pr-4 text-left">
         <.link to={site.endpoint} label={site.endpoint} title="Go to Endpoint" target="_blank" />
@@ -23,10 +23,10 @@
       <td class="py-2 pr-4 text-left"><%= site.interval |> SituationRoom.Sites.CheckIntervals.get_interval_string() %></td>
       <td class="py-2">
         <span>
-          <.button label="Edit" color="primary" link_type="a" to={Routes.site_path(@conn, :edit, site)} class="mr-2" />
+          <.button label="Edit" color="primary" link_type="a" to={Routes.site_path(@socket, :edit, site)} class="mr-2" />
         </span>
         <span>
-          <.button label="Delete" color="danger" link_type="a" to={Routes.site_path(@conn, :delete, site)} method={:delete} data={[confirm: "Are you sure?"]} />
+          <.button label="Delete" color="danger" link_type="a" to={Routes.site_path(@socket, :delete, site)} method={:delete} data={[confirm: "Are you sure?"]} />
         </span>
       </td>
     </tr>
@@ -34,4 +34,4 @@
   </tbody>
 </table>
 
-<.button label="Add New Site" color="primary" link_type="a" to={Routes.site_path(@conn, :new)} class="mt-6" />
+<.button label="Add New Site" color="primary" link_type="a" to={Routes.site_path(@socket, :new)} class="mt-6" />

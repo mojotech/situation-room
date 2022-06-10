@@ -17,9 +17,14 @@ defmodule SituationRoomWeb.Router do
   scope "/", SituationRoomWeb do
     pipe_through(:browser)
 
-    resources("/sites", SiteController)
 
     live("/", SiteLive)
+    # sites 
+    # sites - live index
+    live("/sites", Live.Sites.Index, :index)
+
+    # sites - crud
+    resources("/sites", SiteController, except: [:index])
   end
 
   # Other scopes may use custom stacks.
