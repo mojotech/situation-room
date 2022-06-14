@@ -19,7 +19,11 @@ defmodule SituationRoom.Site.Outage do
   @doc false
   def changeset(outage, attrs) do
     outage
-    |> cast(attrs, [:resolved, :notified_outage, :notified_resolved])
-    |> validate_required([:resolved, :notified_outage, :notified_resolved])
+    |> cast(attrs, [:site_id, :resolved, :notified_outage, :notified_resolved])
+    |> validate_required([:site_id, :resolved, :notified_outage, :notified_resolved])
+  end
+
+  def changeset(whole_outage) do
+    validate_required(whole_outage, [:site_id, :resolved, :notified_outage, :notified_resolved])
   end
 end

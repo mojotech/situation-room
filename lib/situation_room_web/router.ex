@@ -18,6 +18,7 @@ defmodule SituationRoomWeb.Router do
     pipe_through(:browser)
 
     resources("/sites", SiteController)
+    resources("/site_checks", SiteCheckController)
 
     live("/", SiteLive)
   end
