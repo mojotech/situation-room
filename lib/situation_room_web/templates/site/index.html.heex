@@ -19,7 +19,14 @@
       <td class="py-2 pr-4 text-left">
         <.link to={site.endpoint} label={site.endpoint} title="Go to Endpoint" target="_blank" />
       </td>
-      <td class="py-2 pr-4 text-left">Coming Soon...</td>
+      <td class="py-2">
+        <span>
+          <%# <.button label="Run Check" color="primary" method={SituationRoom.Sites.get_site!(site.id) |> SituationRoom.Check.Manager.all_checks()}/>  %>
+          <%# <.button label="Run Check" color="primary" phx-click="run_check"}/> %>
+          <.button label="Run Check" color="primary" link_type="a" to={Routes.site_check_path(@conn, :edit, site)} class="mt-2"/>
+        </span>
+
+      </td>
       <td class="py-2 pr-4 text-left"><%= site.interval |> SituationRoom.Sites.CheckIntervals.get_interval_string() %></td>
       <td class="py-2">
         <span>

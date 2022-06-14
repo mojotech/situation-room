@@ -1,0 +1,9 @@
+<h2 class="mb-4 text-xl">Result of latest check for <%= @site.name %>:</h2>
+
+<%# <%= render "form.html", Map.put(assigns, :action, Routes.site_path(@conn, :update, @site)) %>
+
+<%# <div class="my-4"><.alert color="danger" label="Oops, something went wrong! Please check the errors below." /></div> %>
+<div>
+<strong><%= @check %></strong>
+</div>
+<.button label="Back to My Sites" color="gray" link_type="a" to={Routes.site_path(@conn, :index)} class="mt-6" />
