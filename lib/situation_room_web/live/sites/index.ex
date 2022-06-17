@@ -16,6 +16,14 @@ defmodule SituationRoomWeb.Live.Sites.Index do
     {:noreply, update(socket, :sites, fn sites -> [site | sites] end)}
   end
 
+  def handle_info({:site_updated, _site}, socket) do
+    {:noreply, update(socket, :sites, fn _sites -> fetch_sites() end)}
+  end
+
+  def handle_info({:site_deleted, _site}, socket) do
+    {:noreply, update(socket, :sites, fn _sites -> fetch_sites() end)}
+  end
+
   defp fetch_sites do
     Sites.get_all_sites()
   end
