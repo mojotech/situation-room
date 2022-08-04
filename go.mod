@@ -17,6 +17,7 @@ require (
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/ziutek/mymysql v1.5.4 // indirect
 	golang.org/x/crypto v0.0.0-20200420104511-884d27f42877 // indirect
+	golang.org/x/sys v0.0.0-20220803195053-6e608f9ce704 // indirect
 	gopkg.in/gorp.v1 v1.7.2
 	gopkg.in/urfave/cli.v1 v1.20.0 // indirect
 )
