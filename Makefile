@@ -15,7 +15,7 @@ build: *.go
 	GORARCH=arm64 GOOS=linux go build -o $(BUILD_DIR)/$(BINARY_NAME)-linux-arm64
 	GORARCH=arm64 GOOS=windows go build -o $(BUILD_DIR)/$(BINARY_NAME)-windows-arm64
 
-run:
+run: build
 	./$(BUILD_DIR)/$(BINARY_NAME)-$(GOOS)-$(GOARCH)
 
 gin:

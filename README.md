@@ -51,14 +51,14 @@ If you don't want to use gin you can do the usual:
 
 ```bash
 $ make
-$ ./build/situation-room
+$ make run
 ```
 
 ### NOTE
 
 A local sqlite file (`situation-room.db.bin`) is included in the repository to see initial sites locally and on staging
 until a more permanent datastore solution is implemented.  This means, that if you run the site
-locally instead of agains the [Heroku staging site][8] your local copy of this DB file will show changes.
+locally instead of against the [Heroku staging site][8] your local copy of this DB file will show changes.
 
 These changes **should not be** submitted back to the repository!  You can configure your local copy
 of the git repository to ignore changes to the database file with the following command:
