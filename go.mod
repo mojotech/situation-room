@@ -1,4 +1,4 @@
-// +heroku goVersion go1.13
+// +heroku goVersion go1.19
 
 module github.com/mojotech/situation-room
 
