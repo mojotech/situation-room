@@ -7,6 +7,13 @@ checks like load times, page load sizes, etc... will be added.
 
 The repo is currently in the process of being converted into elixir.
 Updates will soon follow.
+
+### Comparables
+
+* [https://updown.io/](https://uptimerobot.com/)
+* [https://www.statuscake.com/](https://uptimerobot.com/)
+* [https://uptimerobot.com/](https://uptimerobot.com/)
+
 ## Requirements
 
 1. [asdf version manager][2]
