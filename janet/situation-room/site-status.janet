@@ -1,19 +1,6 @@
 (use joy)
 (import http)
 
-(defn check-site-status
-  [site]
-  (let [start-time (os/clock)
-        status (http/get (get site :url))
-        end-time (os/clock)]
-    {:status-code (get status :status)
-     :response-time (- end-time start-time)}))
-
-(defn check-site-with-timer
-  [site timer]
-  (ev/sleep timer)
-  (check-site-status site))
-
 (defn- write-site-check
   [site status]
   (db/insert :checks {:url (get site :url)
@@ -29,6 +16,14 @@
         (db/update :sites site-id {:status status-code}))
     status))
 
+(defn check-site-status
+  [site]
+  (let [start-time (os/clock)
+        status (http/get (get site :url))
+        end-time (os/clock)]
+    {:status-code (get status :status)
+     :response-time (- end-time start-time)}))
+
 (defn update-site-status
   "Check the site status, and insert a new site check record into the DB"
   [site]
@@ -36,3 +31,10 @@
       (check-site-status)
       (maybe-write-site-status site)
       (write-site-check site)))
+
+(defn check-site-with-timer
+  [site timer]
+  (printf "[status] Checking site: %s" (get site :url))
+  (update-site-status site)
+  (printf "[status] Sleeping site: %s for %d" (get site :url) timer)
+  (ev/sleep timer))

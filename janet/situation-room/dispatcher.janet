@@ -5,8 +5,12 @@
 
 (defn- dispatch-site
   [site]
-  (printf "[dispatcher] Dispatching new site: %s" (get site :url))
-  (update-site-status site))
+  (let [site-url (get site :url)
+        site-duration (get site :duration)]
+    (printf "[dispatcher] Dispatching new site: %s with interval: %d" site-url site-duration)
+    (ev/spawn
+      (forever
+        (check-site-with-timer site site-duration)))))
 
 (defn start-dispatcher
   "Start a site checker for every tracked site."
