@@ -1,0 +1,8 @@
+# situation-room config file
+# Format: url,interval_seconds,timeout_ms
+https://google.com,60,5000
+https://github.com,30,3000
+https://craigjolicoeur.com,60,10000
+https://marketadvantageplus.com,60,10000
+https://www.mojotech.com,60,10000
+https://does-not-exists.com,10,3000
