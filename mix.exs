@@ -51,7 +51,9 @@ defmodule SituationRoom.MixProject do
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
       {:tailwind, "~> 0.1", runtime: Mix.env() == :dev},
-      {:petal_components, "~> 0.16"}
+      {:petal_components, "~> 0.16"},
+      {:tesla, "~> 1.4"},
+      {:finch, "~> 0.3"}
     ]
   end
 
